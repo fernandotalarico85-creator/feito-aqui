@@ -80,6 +80,7 @@ export default async function PedidosRecebidosPage({
                       </span>
                     )}
                   </div>
+                  <p className="font-mono text-xs text-stone-400">{pedido.numeroOS}</p>
                   <p className="mt-1 text-sm text-stone-500">
                     {pedido.address.bairro}, {pedido.address.cidade} ·{" "}
                     {pedido.janelaDataInicio.toLocaleDateString("pt-BR")} a{" "}

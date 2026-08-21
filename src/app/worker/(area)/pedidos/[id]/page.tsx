@@ -45,6 +45,7 @@ export default async function DetalhePedidoWorkerPage({
       </Link>
 
       <h1 className="mt-2 text-xl font-semibold text-stone-900">{pedido.category.nome}</h1>
+      <p className="font-mono text-xs text-stone-400">{pedido.numeroOS}</p>
       <p className="mt-1 text-sm text-stone-500">
         {pedido.address.bairro}, {pedido.address.cidade} — endereço completo e dados de
         contato do cliente são liberados só após o orçamento ser aceito.
@@ -73,6 +74,7 @@ export default async function DetalhePedidoWorkerPage({
       {meuOrcamento ? (
         <div className="mt-6 rounded-lg border border-stone-200 bg-white p-4">
           <p className="text-sm font-medium text-stone-900">Seu orçamento já foi enviado</p>
+          <p className="font-mono text-xs text-stone-400">{meuOrcamento.numeroPO}</p>
           <p className="mt-1 text-sm text-stone-600">
             Valor: R$ {meuOrcamento.valor.toFixed(2)} · Meu prazo de entrega:{" "}
             {meuOrcamento.prazoEntrega.toLocaleDateString("pt-BR")}

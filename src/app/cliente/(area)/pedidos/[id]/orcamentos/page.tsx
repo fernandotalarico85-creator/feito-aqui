@@ -63,6 +63,7 @@ export default async function OrcamentosRecebidosPage({
       <p className="mt-1 text-sm text-stone-500">
         {pedido.category.nome} — {pedido.address.bairro}, {pedido.address.cidade}
       </p>
+      <p className="font-mono text-xs text-stone-400">{pedido.numeroOS}</p>
 
       {erro && (
         <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -97,6 +98,7 @@ export default async function OrcamentosRecebidosPage({
                     ★ {budget.worker.notaMediaRecente > 0 ? budget.worker.notaMediaRecente.toFixed(1) : "—"}
                   </span>
                 </div>
+                <p className="font-mono text-xs text-stone-400">{budget.numeroPO}</p>
                 <p className="mt-1 text-sm text-stone-500">
                   Prazo de entrega: {budget.prazoEntrega.toLocaleDateString("pt-BR")}
                 </p>

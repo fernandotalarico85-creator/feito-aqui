@@ -99,6 +99,9 @@ export default async function AcompanhamentoBookingClientePage({
       <h1 className="mt-2 text-xl font-semibold text-stone-900">
         {budget.serviceRequest.category.nome}
       </h1>
+      <p className="font-mono text-xs text-stone-400">
+        {budget.serviceRequest.numeroOS} · {budget.numeroPO}
+      </p>
       <p className="mt-1 text-sm text-stone-500">
         {budget.serviceRequest.address.logradouro}, {budget.serviceRequest.address.numero} —{" "}
         {budget.serviceRequest.address.bairro}, {budget.serviceRequest.address.cidade}

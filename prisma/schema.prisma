@@ -317,6 +317,9 @@ model SubService {
 
 model ServiceRequest {
   id              String          @id @default(cuid())
+  // Identificador legível (Prompt 11) — formato OS-AAMMDD-NNNNN, gerado em
+  // src/lib/numeracao.ts. Facilita busca/referência em disputas e suporte.
+  numeroOS        String          @unique
   clientProfileId String
   clientProfile   ClientProfile   @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
 
@@ -339,6 +342,9 @@ model ServiceRequest {
 
 model Budget {
   id               String         @id @default(cuid())
+  // Identificador legível (Prompt 11) — formato PO-AAMMDD-NNNNN, gerado em
+  // src/lib/numeracao.ts.
+  numeroPO         String         @unique
   serviceRequestId String
   serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
 
@@ -512,4 +518,20 @@ model Dispute {
   dataDecisao     DateTime?
 
   criadoEm DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Numeração de documentos (Prompt 11) — OS (pedido) e PO (orçamento)
+// ---------------------------------------------------------------------------
+
+/** Contador atômico por tipo de documento + dia (reinicia a cada dia) — usado por
+ * src/lib/numeracao.ts pra gerar OS-AAMMDD-NNNNN e PO-AAMMDD-NNNNN. O upsert nessa
+ * tabela é atômico no Postgres, então é seguro mesmo com criações simultâneas. */
+model SequenciaDiaria {
+  id       String @id @default(cuid())
+  tipo     String // "OS" ou "PO"
+  data     String // AAMMDD
+  contador Int    @default(0)
+
+  @@unique([tipo, data])
 }

@@ -80,6 +80,9 @@ export default async function DisputasPage() {
 
             return (
               <li key={review.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <p className="font-mono text-xs text-stone-400">
+                  {review.booking.budget.serviceRequest.numeroOS} · {review.booking.budget.numeroPO}
+                </p>
                 <p className="text-xs text-stone-400">
                   {categoria} · Cliente: {cliente.nome} · Worker: {worker.nome}
                 </p>
@@ -239,6 +242,9 @@ export default async function DisputasPage() {
 
             return (
               <li key={booking.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <p className="font-mono text-xs text-stone-400">
+                  {booking.budget.serviceRequest.numeroOS} · {booking.budget.numeroPO}
+                </p>
                 <p className="text-xs text-stone-400">
                   {categoria} · Cliente: {cliente.nome} · Worker: {worker.nome}
                 </p>

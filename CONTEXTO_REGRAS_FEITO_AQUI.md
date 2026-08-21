@@ -27,12 +27,13 @@ plataforma cobra comissão. Vertical de lançamento do protótipo: **reforma/con
   recente, taxa de conclusão no prazo, taxa de comparecimento, tempo médio de resposta, volume de
   serviços concluídos, elegívelParaTriagem (bool, corte de qualidade), destaquePago (bool + validade).
 - **Agenda** — workerId, data, disponível (bool).
-- **ServiceRequest** (pedido do cliente) — clienteId, descrição livre, categoria(s) sugeridas
-  pela triagem, sub-serviços, janela de data desejada, status (`triagem` | `aguardando_orcamento`
-  | `orcado` | `fechado` | `em_andamento` | `concluido` | `cancelado`).
-- **Budget** (orçamento) — serviceRequestId, workerId, valor, prazoComprometido (definido pelo
-  worker, não pela IA), status (`pendente` | `aceito` | `recusado` | `expirado`),
-  contraproposta { status, valor, prazo, mensagem } (ver 3.9).
+- **ServiceRequest** (pedido do cliente) — numeroOS (ver 3.10), clienteId, descrição livre,
+  categoria(s) sugeridas pela triagem, sub-serviços, janela de data desejada, status
+  (`triagem` | `aguardando_orcamento` | `orcado` | `fechado` | `em_andamento` | `concluido`
+  | `cancelado`).
+- **Budget** (orçamento) — numeroPO (ver 3.10), serviceRequestId, workerId, valor,
+  prazoComprometido (definido pelo worker, não pela IA), status (`pendente` | `aceito` |
+  `recusado` | `expirado`), contraproposta { status, valor, prazo, mensagem } (ver 3.9).
 - **Booking** (serviço fechado) — budgetId, valorTotal, comissaoValor, comissaoPercentual,
   status, checkIn { horário, geolocalização, dentroDaGeofence }, checkOut { horário,
   geolocalização }, alertaSaidaProlongada (bool).
@@ -191,6 +192,16 @@ Tabela simplificada de infrações para o protótipo:
 - Um orçamento com contra-proposta pendente de resposta do worker **não expira**: nesse caso
   o cliente já agiu, quem está devendo resposta é o worker — não faz sentido punir o cliente
   por uma inatividade que não é dele.
+
+### 3.10 Numeração de documentos — OS e PO (Prompt 11) `[padrão de protótipo, ajustável]` — implementado
+- Todo pedido (`ServiceRequest`) ganha um identificador legível **OS-AAMMDD-NNNNN** no
+  momento da criação, ex.: `OS-260820-00001`. Todo orçamento (`Budget`) ganha
+  **PO-AAMMDD-NNNNN**, ex.: `PO-260820-00001`.
+- O sequencial reinicia em `00001` a cada dia, por tipo de documento — não é um contador
+  global. Gerado em `src/lib/numeracao.ts` (`gerarNumeroDocumento`), via upsert atômico
+  numa tabela de contadores (`SequenciaDiaria`), seguro mesmo com criações simultâneas.
+- Visível pro cliente, worker e admin em toda tela que lista ou detalha um pedido/orçamento
+  (facilita busca e referência em disputas/suporte) — não é só um campo interno.
 
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 

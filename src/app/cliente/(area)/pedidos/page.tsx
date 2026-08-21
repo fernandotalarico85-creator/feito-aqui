@@ -75,6 +75,7 @@ export default async function MeusPedidosPage() {
                     </span>
                   </div>
                 </div>
+                <p className="mt-0.5 font-mono text-xs text-stone-400">{pedido.numeroOS}</p>
                 <p className="mt-1 text-sm text-stone-500">
                   {pedido.address.bairro}, {pedido.address.cidade} · {pedido.budgets.length}{" "}
                   orçamento(s) recebido(s)

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
+import { gerarNumeroDocumento } from "@/lib/numeracao";
 
 export async function enviarOrcamentoAction(formData: FormData) {
   const usuario = await exigirUsuario("WORKER");
@@ -26,8 +27,11 @@ export async function enviarOrcamentoAction(formData: FormData) {
   });
   if (jaExiste) redirect(`/worker/pedidos/${serviceRequestId}`);
 
+  const numeroPO = await gerarNumeroDocumento("PO");
+
   await prisma.budget.create({
     data: {
+      numeroPO,
       serviceRequestId,
       workerId: worker.id,
       valor,

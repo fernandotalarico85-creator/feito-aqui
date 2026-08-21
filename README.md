@@ -99,6 +99,10 @@ Implementado de verdade, com efeito real no banco de dados:
   campo de status).
 - **Upload de fotos** (portfólio, avaliações, evidências, conclusão de serviço) vai pro
   Vercel Blob de verdade (`src/lib/upload.ts`) — não é mock nem storage local.
+- **Numeração de pedidos e orçamentos** (Seção 3.10): todo `ServiceRequest` ganha um
+  `numeroOS` (`OS-AAMMDD-NNNNN`) e todo `Budget` um `numeroPO` (`PO-AAMMDD-NNNNN`) na
+  criação — sequencial reinicia por dia, gerado atomicamente em `src/lib/numeracao.ts`.
+  Visível em toda tela de cliente/worker/admin que lista ou detalha um pedido/orçamento.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { sugerirServicos } from "@/lib/triagem";
 import { geocodificarMock } from "@/lib/geo";
+import { gerarNumeroDocumento } from "@/lib/numeracao";
 
 export async function criarPedidoAction(formData: FormData) {
   const usuario = await exigirUsuario("CLIENTE");
@@ -76,8 +77,11 @@ export async function criarPedidoAction(formData: FormData) {
     addressId = endereco.id;
   }
 
+  const numeroOS = await gerarNumeroDocumento("OS");
+
   const pedido = await prisma.serviceRequest.create({
     data: {
+      numeroOS,
       clientProfileId: clientProfile.id,
       categoryId: categoriaId,
       addressId,

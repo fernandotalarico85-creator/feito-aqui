@@ -72,6 +72,7 @@ export default async function ProfissionaisRecomendadosPage({
         Para o pedido de <strong>{pedido.category.nome}</strong> em{" "}
         {pedido.address.bairro}, {pedido.address.cidade}.
       </p>
+      <p className="font-mono text-xs text-stone-400">{pedido.numeroOS}</p>
 
       {solicitado && (
         <p className="mt-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">

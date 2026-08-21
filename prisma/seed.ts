@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/db";
+import { gerarNumeroDocumento } from "../src/lib/numeracao";
 
 const SENHA_PADRAO = "senha123";
 
@@ -10,6 +11,7 @@ async function hash(senha: string) {
 async function main() {
   console.log("Seed: limpando dados existentes...");
   // Ordem respeita as dependências de chave estrangeira.
+  await prisma.sequenciaDiaria.deleteMany();
   await prisma.dispute.deleteMany();
   await prisma.strike.deleteMany();
   await prisma.walletTransaction.deleteMany();
@@ -267,6 +269,7 @@ async function main() {
 
   const pedidoTeste = await prisma.serviceRequest.create({
     data: {
+      numeroOS: await gerarNumeroDocumento("OS"),
       clientProfileId: cliente1.clientProfile!.id,
       categoryId: categoriaBanheiro.id,
       addressId: enderecoCliente1.id,
@@ -284,6 +287,7 @@ async function main() {
   await prisma.budget.createMany({
     data: [
       {
+        numeroPO: await gerarNumeroDocumento("PO"),
         serviceRequestId: pedidoTeste.id,
         workerId: workerRoberto.workerProfileId,
         valor: 3200,
@@ -291,6 +295,7 @@ async function main() {
         status: "PENDENTE",
       },
       {
+        numeroPO: await gerarNumeroDocumento("PO"),
         serviceRequestId: pedidoTeste.id,
         workerId: workerMarcos.workerProfileId,
         valor: 2900,

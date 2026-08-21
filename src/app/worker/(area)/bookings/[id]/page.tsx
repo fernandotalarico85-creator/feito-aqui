@@ -164,6 +164,9 @@ export default async function AcompanhamentoBookingWorkerPage({
       <h1 className="mt-2 text-xl font-semibold text-stone-900">
         {budget.serviceRequest.category.nome}
       </h1>
+      <p className="font-mono text-xs text-stone-400">
+        {budget.serviceRequest.numeroOS} · {budget.numeroPO}
+      </p>
       <p className="mt-1 text-sm text-stone-500">
         {endereco.logradouro}, {endereco.numero} — {endereco.bairro}, {endereco.cidade}
       </p>

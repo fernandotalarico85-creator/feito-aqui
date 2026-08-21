@@ -51,7 +51,7 @@ export default async function NovoStrikePage({
         bookingsSemCheckIn={bookingsSemCheckIn.map((b) => ({
           id: b.id,
           workerId: b.budget.workerId,
-          label: `${b.budget.serviceRequest.category.nome} — fechado em ${b.criadoEm.toLocaleDateString("pt-BR")}`,
+          label: `${b.budget.serviceRequest.numeroOS} — ${b.budget.serviceRequest.category.nome} — fechado em ${b.criadoEm.toLocaleDateString("pt-BR")}`,
         }))}
       />
     </div>

@@ -46,6 +46,9 @@ export default async function RepassesAdminPage({
         <ul className="mt-6 flex flex-col gap-4">
           {repasses.map((r) => (
             <li key={r.id} className="rounded-lg border border-stone-200 bg-white p-4">
+              <p className="font-mono text-xs text-stone-400">
+                {r.booking.budget.serviceRequest.numeroOS} · {r.booking.budget.numeroPO}
+              </p>
               <p className="text-xs text-stone-400">
                 {r.workerProfile.user.nome} · {r.booking.budget.serviceRequest.category.nome} · R${" "}
                 {r.valor.toFixed(2)}

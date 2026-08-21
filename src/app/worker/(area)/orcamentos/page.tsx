@@ -55,6 +55,9 @@ export default async function MeusOrcamentosPage() {
                   {STATUS_LABEL[orcamento.status]}
                 </span>
               </div>
+              <p className="font-mono text-xs text-stone-400">
+                {orcamento.numeroPO} · {orcamento.serviceRequest.numeroOS}
+              </p>
               <p className="mt-1 text-sm text-stone-500">
                 {orcamento.serviceRequest.address.bairro}, {orcamento.serviceRequest.address.cidade}{" "}
                 · R$ {orcamento.valor.toFixed(2)}
