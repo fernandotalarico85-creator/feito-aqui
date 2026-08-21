@@ -1,0 +1,515 @@
+// Feito Aqui — Protótipo v0.1
+// Schema baseado na Seção 2 (Entidades principais) de CONTEXTO_REGRAS_FEITO_AQUI.md
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum TipoUsuario {
+  CLIENTE
+  WORKER
+  ADMIN
+}
+
+enum StatusVerificacao {
+  PENDENTE
+  VERIFICADO
+}
+
+enum StatusServiceRequest {
+  TRIAGEM
+  AGUARDANDO_ORCAMENTO
+  ORCADO
+  FECHADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum StatusBudget {
+  PENDENTE
+  ACEITO
+  RECUSADO
+  EXPIRADO // não respondido pelo cliente dentro do prazo (ver ORCAMENTO_PRAZO_EXPIRACAO_DIAS)
+}
+
+/** Negociação de orçamento — cliente propõe outro valor/prazo, worker aceita ou
+ * recusa. Recusar não mata o orçamento original: ele continua PENDENTE no valor
+ * inicial, o cliente pode aceitar como estava ou tentar uma nova contra-proposta. */
+enum StatusContraproposta {
+  NENHUMA
+  PENDENTE_WORKER
+  RECUSADA_PELO_WORKER
+}
+
+enum StatusBooking {
+  FECHADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum StatusContestacao {
+  NENHUMA
+  EM_ANALISE
+  MANTIDA
+  REVERTIDA
+}
+
+enum TipoWalletTransaction {
+  CREDITO_AVALIACAO
+  ESTORNO
+  USO_EM_SERVICO
+  REEMBOLSO_NO_SHOW // cobre no-show (Seção 3.6) e cancelamento tardio do worker equivalente
+}
+
+enum OrigemCancelamento {
+  WORKER
+  CLIENTE
+}
+
+enum StatusWalletTransaction {
+  CARENCIA
+  LIBERADO
+  USADO
+  ESTORNADO
+}
+
+enum GravidadeStrike {
+  MEDIA
+  GRAVE
+  GRAVISSIMA
+}
+
+/** Confirmação de entrega pelo cliente (Seção 3.8) — a parcela final do repasse só
+ * libera depois de CONFIRMADO (manual ou automático por prazo), nunca só por o worker
+ * se autodeclarar concluído. */
+enum StatusConclusao {
+  AGUARDANDO_CONFIRMACAO_CLIENTE
+  CONFIRMADO
+  CONTESTADO
+}
+
+// ---------------------------------------------------------------------------
+// Autenticação / usuários
+// ---------------------------------------------------------------------------
+
+model User {
+  id        String      @id @default(cuid())
+  nome      String
+  email     String      @unique
+  senhaHash String
+  tipo      TipoUsuario
+  criadoEm  DateTime    @default(now())
+
+  clientProfile ClientProfile?
+  workerProfile WorkerProfile?
+  sessions      Session[]
+  decisoesAdmin Dispute[]      @relation("DecisoesAdmin")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criadoEm  DateTime @default(now())
+  expiraEm  DateTime
+}
+
+// ---------------------------------------------------------------------------
+// Perfis
+// ---------------------------------------------------------------------------
+
+model ClientProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  enderecos            Address[]
+  serviceRequests      ServiceRequest[]
+  walletTransactions   WalletTransaction[]
+  strikes              Strike[]
+  cancelamentosTardios CancelamentoTardio[]
+}
+
+/** Log de cancelamentos tardios (pós-fechamento) feitos pelo cliente — janela móvel de
+ * 90 dias para detectar reincidência (Seção 3.6 / princípio de confiança de mão dupla).
+ * Não é um contador simples porque precisa "esquecer" ocorrências fora da janela. */
+model CancelamentoTardio {
+  id              String        @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  bookingId String
+  criadoEm  DateTime @default(now())
+}
+
+model Address {
+  id              String        @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  rotulo     String // ex.: "Casa", "Apartamento da obra"
+  logradouro String
+  numero     String
+  bairro     String
+  cidade     String
+  estado     String
+  cep        String
+  latitude   Float
+  longitude  Float
+
+  serviceRequests ServiceRequest[]
+}
+
+model WorkerProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio                  String
+  regiaoAtendimento    String
+  statusVerificacao    StatusVerificacao @default(PENDENTE)
+  elegivelParaTriagem  Boolean           @default(true)
+  destaquePago         Boolean           @default(false)
+  destaquePagoValidoAte DateTime?
+
+  // Métricas usadas na fórmula de ranking (Seção 3.3) — recalculadas conforme
+  // reviews/bookings acontecem, ver src/lib/ranking.ts
+  notaMediaRecente      Float @default(0)
+  taxaConclusaoPrazo    Float @default(0) // 0..1
+  taxaComparecimento    Float @default(0) // 0..1
+  tempoMedioRespostaMin Int   @default(60)
+  volumeConcluidos      Int   @default(0)
+
+  categorias     ServiceCategory[]
+  portfolioItens PortfolioItem[]
+  agenda         AgendaDia[]
+  budgets        Budget[]
+  strikes        Strike[]
+  repasses       RepasseWorker[]
+
+  criadoEm DateTime @default(now())
+}
+
+enum TipoRepasse {
+  ACEITE // 2% — liberado quando o orçamento é aceito e pago
+  PONTUALIDADE // 30% — liberado no check-in dentro da tolerância
+  CONCLUSAO // resto — liberado na conclusão do serviço
+}
+
+enum StatusRepasse {
+  PENDENTE
+  EM_ANALISE // worker enviou justificativa de atraso, aguardando decisão do admin
+  CARENCIA // admin aprovou liberação futura (liberadoEm no futuro)
+  LIBERADO
+}
+
+/** Repasse do worker em 3 parcelas por Booking (regra pedida pelo usuário no meio do
+ * Prompt 9) — substitui o modelo antigo de "comissão única na conclusão". */
+model RepasseWorker {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  tipo   TipoRepasse
+  valor  Float
+  status StatusRepasse @default(PENDENTE)
+
+  // Justificativa do worker pra check-in fora da tolerância — decide se a admin libera
+  // a parcela de pontualidade na hora, agenda pra depois, ou deixa cair no fallback
+  // (libera junto com a conclusão).
+  justificativaTexto     String?
+  justificativaDataEnvio DateTime?
+
+  liberadoEm DateTime?
+  criadoEm   DateTime  @default(now())
+
+  disputes Dispute[]
+}
+
+enum OrigemPortfolioItem {
+  EXTERNO // serviço feito fora da plataforma — descrição livre, sem verificação
+  PLATAFORMA // vinculado a um Booking concluído — dados puxados automaticamente
+}
+
+model PortfolioItem {
+  id              String        @id @default(cuid())
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  origem OrigemPortfolioItem @default(EXTERNO)
+
+  // Só preenchido quando origem = PLATAFORMA. Um booking só pode virar 1 post.
+  bookingId String?  @unique
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  // Opcional agora (Seção 3.8): posts promovidos direto de uma ServicePhoto do
+  // check-out só têm a foto "depois" (resultado) — o formulário manual de portfólio
+  // (origem EXTERNO) continua exigindo "antes" na própria action.
+  fotoAntesUrl  String?
+  fotoDepoisUrl String?
+  descricao     String? // usado só quando origem = EXTERNO
+  criadoEm      DateTime @default(now())
+}
+
+/** Foto(s) do "depois" enviada(s) pelo worker ao marcar conclusão no check-out
+ * (Seção 3.8) — obrigatório pelo menos 1 antes do status avançar para concluído.
+ * Podem ser promovidas para o portfólio na hora ou depois, a partir do perfil. */
+model ServicePhoto {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  url      String
+  criadoEm DateTime @default(now())
+}
+
+model AgendaDia {
+  id              String        @id @default(cuid())
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  data       DateTime
+  disponivel Boolean  @default(true)
+
+  @@unique([workerProfileId, data])
+}
+
+// ---------------------------------------------------------------------------
+// Taxonomia de serviços (Seção 3.2 — triagem guiada)
+// ---------------------------------------------------------------------------
+
+model ServiceCategory {
+  id   String @id @default(cuid())
+  nome String @unique // ex.: "Reforma de banheiro"
+
+  subServicos     SubService[]
+  workers         WorkerProfile[]
+  serviceRequests ServiceRequest[]
+}
+
+model SubService {
+  id         String          @id @default(cuid())
+  categoryId String
+  category   ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  nome  String
+  ordem Int // ordem de execução recomendada dentro da categoria
+}
+
+// ---------------------------------------------------------------------------
+// Pedido → orçamento → fechamento
+// ---------------------------------------------------------------------------
+
+model ServiceRequest {
+  id              String          @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile   @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   ServiceCategory @relation(fields: [categoryId], references: [id])
+
+  addressId String
+  address   Address @relation(fields: [addressId], references: [id])
+
+  descricaoLivre     String
+  subServicosJson     String // JSON: ids/nomes dos sub-serviços sugeridos, na ordem
+  janelaDataInicio    DateTime
+  janelaDataFim       DateTime
+  status              StatusServiceRequest @default(TRIAGEM)
+
+  budgets Budget[]
+
+  criadoEm DateTime @default(now())
+}
+
+model Budget {
+  id               String         @id @default(cuid())
+  serviceRequestId String
+  serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+
+  workerId String
+  worker   WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  valor           Float
+  prazoEntrega    DateTime // prazo definido pelo worker, não pela IA
+  status          StatusBudget @default(PENDENTE)
+
+  // Contra-proposta do cliente (negociação de orçamento) — ver src/lib/fecharOrcamento.ts
+  contrapropostaStatus      StatusContraproposta @default(NENHUMA)
+  valorContraproposta       Float?
+  prazoEntregaContraproposta DateTime?
+  contrapropostaMensagem    String?
+  contrapropostaCriadaEm    DateTime?
+
+  booking Booking?
+
+  criadoEm DateTime @default(now())
+}
+
+model Booking {
+  id       String @id @default(cuid())
+  budgetId String @unique
+  budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  valorTotal          Float
+  comissaoValor        Float
+  comissaoPercentual   Float
+  pagamentoStatus      String        @default("simulado_aprovado")
+  status               StatusBooking @default(FECHADO)
+
+  checkInHorario        DateTime?
+  checkInLatitude       Float?
+  checkInLongitude      Float?
+  checkInDentroGeofence Boolean?
+  checkInAtrasado       Boolean   @default(false)
+
+  checkOutHorario   DateTime?
+  checkOutLatitude  Float?
+  checkOutLongitude Float?
+
+  alertaSaidaProlongada Boolean @default(false)
+
+  // Cancelamento pós-fechamento (Prompt 9 / Seção 3.6)
+  canceladoPor        OrigemCancelamento?
+  canceladoEm         DateTime?
+  motivoCancelamento  String?
+  // true = cancelado antes do dia do serviço chegar (não pesa no comparecimento);
+  // false = cancelado tardiamente, no dia ou depois (conta contra o comparecimento).
+  canceladoAntesDoDia Boolean?
+
+  // Confirmação de entrega (Seção 3.8) — marcar conclusão no check-out não libera a
+  // parcela final do repasse sozinho; fica pendente até o cliente confirmar, contestar,
+  // ou o prazo de confirmação automática se esgotar (ver src/lib/confirmacaoConclusao.ts).
+  statusConclusao         StatusConclusao?
+  conclusaoMarcadaEm      DateTime?
+  conclusaoConfirmadaEm   DateTime?
+  conclusaoAutoConfirmada Boolean          @default(false)
+  contestacaoConclusaoTexto     String?
+  contestacaoConclusaoDataEnvio DateTime?
+
+  review             Review?
+  portfolioItem      PortfolioItem?
+  walletTransactions WalletTransaction[]
+  repasses           RepasseWorker[]
+  servicePhotos      ServicePhoto[]
+
+  criadoEm DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Avaliação / tokens
+// ---------------------------------------------------------------------------
+
+model Review {
+  id        String  @id @default(cuid())
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  nota       Int // 1..5
+  depoimento String?
+  fotosJson  String? // JSON: urls das fotos
+
+  tokensGerados     Int               @default(0)
+  statusContestacao StatusContestacao @default(NENHUMA)
+
+  replicaWorkerTexto     String?
+  replicaWorkerFotosJson String?
+  replicaWorkerDataEnvio DateTime?
+
+  criadoEm DateTime @default(now())
+
+  disputes           Dispute[]
+  walletTransactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id              String        @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  // Origem do crédito, quando aplicável — usado para checar se a review associada
+  // está em disputa antes de liberar o token (Seção 3.5: "nenhuma avaliação sob
+  // disputa ativa libera token até resolução").
+  reviewId String?
+  review   Review? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+
+  // Preenchido em transações de reembolso (REEMBOLSO_NO_SHOW) — liga o crédito ao
+  // booking que originou o reembolso.
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  descricao String? // rótulo curto pra exibir na carteira (ex.: "No-show do profissional")
+
+  tipo        TipoWalletTransaction
+  valorTokens Int
+  valorReais  Float
+  status      StatusWalletTransaction @default(CARENCIA)
+  liberadoEm  DateTime? // data prevista/efetiva de liberação (criadoEm + janela de carência)
+
+  criadoEm DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Penalidades / disputas (Seção 3.6 e painel admin)
+// ---------------------------------------------------------------------------
+
+model Strike {
+  id String @id @default(cuid())
+
+  workerId String?
+  worker   WorkerProfile? @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  clientProfileId String?
+  clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  tipoInfracao      String
+  gravidade         GravidadeStrike
+  dataOcorrencia    DateTime        @default(now())
+  expiraEm          DateTime
+  statusContestacao StatusContestacao @default(NENHUMA)
+  observacao        String?
+
+  // Contestação do alvo do strike (Seção 3.6) — reaproveita StatusContestacao acima.
+  // Gravíssima não tem direito a contestar (checado no server, não só escondido na UI).
+  replicaTexto     String?
+  replicaFotosJson String?
+  replicaDataEnvio DateTime?
+
+  disputes Dispute[]
+}
+
+model Dispute {
+  id String @id @default(cuid())
+
+  bookingId String?
+  reviewId  String?
+  review    Review? @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  strikeId  String?
+  strike    Strike? @relation(fields: [strikeId], references: [id], onDelete: Cascade)
+  repasseId String?
+  repasse   RepasseWorker? @relation(fields: [repasseId], references: [id], onDelete: Cascade)
+
+  evidenciasJson String? // JSON: texto/fotos/mensagens
+
+  decisao         String?
+  decididoPorId   String?
+  decididoPor     User?     @relation("DecisoesAdmin", fields: [decididoPorId], references: [id])
+  dataDecisao     DateTime?
+
+  criadoEm DateTime @default(now())
+}

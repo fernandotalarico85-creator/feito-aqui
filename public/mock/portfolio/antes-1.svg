@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360">
+  <rect width="480" height="360" fill="#d6d3d1"/>
+  <rect x="0" y="0" width="480" height="360" fill="none" stroke="#a8a29e" stroke-width="2"/>
+  <text x="240" y="190" font-family="Arial, sans-serif" font-size="28" fill="#57534e" text-anchor="middle">Foto "antes" (mock)</text>
+</svg>
