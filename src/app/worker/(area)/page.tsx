@@ -45,10 +45,13 @@ export default async function WorkerDashboardPage() {
           <p className="text-2xl font-semibold text-stone-900">{pedidosDisponiveis}</p>
           <p className="text-sm text-stone-500">pedidos compatíveis com você agora</p>
         </Link>
-        <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <Link
+          href="/worker/orcamentos"
+          className="rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
+        >
           <p className="text-2xl font-semibold text-stone-900">{orcamentosPendentes}</p>
-          <p className="text-sm text-stone-500">orçamentos enviados aguardando resposta</p>
-        </div>
+          <p className="text-sm text-stone-500">orçamento(s) enviado(s) aguardando resposta</p>
+        </Link>
         <Link
           href="/worker/agenda"
           className="rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
