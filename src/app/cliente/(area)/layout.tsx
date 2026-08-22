@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirUsuario } from "@/lib/auth";
 import { sairAction } from "./actions";
+import UserMenu from "./UserMenu";
 
 export default async function ClienteLayout({
   children,
@@ -23,9 +24,6 @@ export default async function ClienteLayout({
             <Link href="/cliente/carteira" className="text-stone-600 hover:text-stone-900">
               Minha carteira
             </Link>
-            <Link href="/cliente/perfil" className="text-stone-600 hover:text-stone-900">
-              Meu perfil
-            </Link>
             <Link
               href="/cliente/pedidos/novo"
               className="rounded-md bg-stone-900 px-3 py-1.5 font-medium text-white hover:bg-stone-700"
@@ -33,12 +31,7 @@ export default async function ClienteLayout({
               + Novo pedido
             </Link>
             <span className="text-stone-400">|</span>
-            <span className="text-stone-500">{usuario.nome}</span>
-            <form action={sairAction}>
-              <button type="submit" className="text-stone-500 underline hover:text-stone-900">
-                Sair
-              </button>
-            </form>
+            <UserMenu nome={usuario.nome} sairAction={sairAction} />
           </nav>
         </div>
       </header>

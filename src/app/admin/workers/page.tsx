@@ -30,7 +30,7 @@ export default async function AdminWorkersPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-stone-900">Workers</h1>
+      <h1 className="text-xl font-semibold text-stone-900">Aprovar Workers</h1>
       <p className="mt-1 text-sm text-stone-500">
         Verificação manual (Seção 4 do contexto — sem KYC real na v0.1): aprove um worker para
         que ele passe a aparecer nos resultados de ranking dos clientes. O documento de

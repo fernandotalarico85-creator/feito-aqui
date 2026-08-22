@@ -22,15 +22,17 @@ const GRAVIDADE_CLASSE: Record<string, string> = {
 export default async function StrikesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ workerId?: string; gravidade?: string }>;
+  searchParams: Promise<{ workerId?: string; gravidade?: string; tipo?: string }>;
 }) {
   await exigirUsuario("ADMIN");
-  const { workerId, gravidade } = await searchParams;
+  const { workerId, gravidade, tipo } = await searchParams;
 
   const [strikes, workers, workersParaSuspensao] = await Promise.all([
     prisma.strike.findMany({
       where: {
         ...(workerId ? { workerId } : {}),
+        ...(tipo === "cliente" ? { clientProfileId: { not: null } } : {}),
+        ...(tipo === "worker" ? { workerId: { not: null } } : {}),
         ...(gravidade && GRAVIDADES_VALIDAS.includes(gravidade)
           ? { gravidade: gravidade as GravidadeStrike }
           : {}),
@@ -45,9 +47,19 @@ export default async function StrikesPage({
     listarWorkersParaSuspensao(),
   ]);
 
+  const tituloTipo = tipo === "cliente" ? "Strikes de clientes" : tipo === "worker" ? "Strikes de workers" : "Strikes";
+
   return (
     <div>
-      <h1 className="text-xl font-semibold text-stone-900">Strikes</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-stone-900">{tituloTipo}</h1>
+        <Link
+          href="/admin/strikes/novo"
+          className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+        >
+          + Registrar strike
+        </Link>
+      </div>
 
       {workersParaSuspensao.length > 0 && (
         <div className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -66,6 +78,7 @@ export default async function StrikesPage({
       )}
 
       <form className="mt-4 flex flex-wrap gap-3 text-sm">
+        {tipo && <input type="hidden" name="tipo" value={tipo} />}
         <select
           name="workerId"
           defaultValue={workerId ?? ""}
@@ -94,7 +107,10 @@ export default async function StrikesPage({
         >
           Filtrar
         </button>
-        <Link href="/admin/strikes" className="self-center text-stone-500 underline">
+        <Link
+          href={tipo ? `/admin/strikes?tipo=${tipo}` : "/admin/strikes"}
+          className="self-center text-stone-500 underline"
+        >
           Limpar
         </Link>
       </form>

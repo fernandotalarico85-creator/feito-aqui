@@ -118,6 +118,13 @@ Implementado de verdade, com efeito real no banco de dados:
   "Portfólio" (galeria de fotos antes/depois, em `/worker/portfolio`) são telas e rotas
   separadas — não compartilham formulário — dentro do dropdown do nome do usuário, junto
   com "Sair". O item "Portfólio" só aparece pra worker.
+- **Dropdown do usuário em cliente/worker/admin** (Seções 3.9 e 3.10): mesmo componente
+  reaproveitado (`src/components/UserMenuDropdown.tsx`) nas três áreas — nenhum link de
+  navegação solto na barra horizontal, tudo dentro do dropdown do nome logado. Cliente tem
+  "Meu Perfil" + "Sair"; worker tem "Meu Perfil" + "Portfólio" + "Sair"; admin tem os grupos
+  expansíveis "Clientes" e "Workers" (cada um com seus subitens — Aprovar Perfil, Strikes,
+  Repasses e Disputas apontam para páginas reais; Perfil de cliente/worker e Portfólio de
+  worker no admin ainda são placeholders "em construção") + "Sair" solto.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

@@ -172,6 +172,41 @@ Tabela simplificada de infrações para o protótipo:
 - Visibilidade do menu (correção de 22/08/2026): o item "Portfólio" só aparece para usuários do
   tipo `worker` — cliente não tem portfólio de fotos de trabalho, então não deve ver esse item
   no seu próprio menu.
+- Menu do cliente (correção de 22/08/2026): segue o MESMO padrão do worker — dropdown no nome
+  do usuário logado (canto superior direito) com "Meu Perfil" e "Sair" (sem "Portfólio", que é
+  exclusivo do worker). "Meu Perfil" do cliente reúne os mesmos blocos do worker (Dados de
+  cadastro com Nome/Sobrenome/E-mail editáveis e CPF/ID travados + Endereço e Foto de perfil
+  editável), só sem o campo "Documento de verificação" (isso é exigido só do worker). "Meu
+  Perfil" e "Sair" existem SOMENTE dentro do dropdown — não devem aparecer soltos na barra de
+  navegação horizontal.
+
+### 3.10 Menu do admin (correção de 22/08/2026)
+Assim como cliente e worker, o admin passa a ter todos os itens hoje soltos na barra horizontal
+reorganizados dentro de um dropdown no nome do usuário logado, com dois grupos e um item solto:
+
+- **Clientes** (grupo)
+  - Perfil — placeholder por enquanto; a área completa de clientes cadastrados (listagem, busca
+    por nome/CPF, detalhe de cada cliente) é escopo de um prompt futuro, não deste.
+  - Strikes — fila de strikes/contestação referente a clientes (reaproveitar a fila de
+    strikes/disputas do admin já existente — Seção 3.6 —, filtrando por `clienteId` se possível;
+    se não for possível filtrar ainda, apontar para a fila geral por enquanto).
+- **Workers** (grupo)
+  - Perfil — placeholder por enquanto; visão analítica/sintética de todos os workers cadastrados
+    é escopo de um prompt futuro.
+  - Aprovar Perfil — link para a página de aprovação/verificação de documento do worker que JÁ
+    EXISTE e já funciona (onde o admin muda `documentoStatus` para `aprovado`/`rejeitado` —
+    Seção 3.9). O título exibido NA PÁGINA passa a ser "Aprovar Workers" (não "Workers").
+  - Portfólio — placeholder por enquanto (visão do admin sobre os portfólios dos workers).
+  - Strikes — fila de strikes/contestação referente a workers (mesma fila existente da Seção
+    3.6, filtrando por `workerId` se possível).
+  - Repasses — placeholder por enquanto (visão do admin sobre os repasses/pagamentos aos
+    workers — Seção 3.8).
+  - Disputas — fila de disputas mediadas que já existe (Seção 3.6/Dispute).
+- **Sair** — item solto, fora dos dois grupos.
+
+Itens marcados "placeholder por enquanto" devem existir como link funcional (sem 404), mostrando
+uma tela simples de "Em construção" — a funcionalidade real desses itens é escopo de prompts
+futuros, não deste ajuste de menu.
 
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 

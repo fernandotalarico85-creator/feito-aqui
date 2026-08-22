@@ -504,6 +504,117 @@ cada tela.
 
 ---
 
+## Prompt 15 — Padronizar o menu do cliente igual ao do worker (dropdown com Meu Perfil + Sair)
+
+```
+Ajuste na área do CLIENTE — já documentado na Seção 3.9 do CONTEXTO_REGRAS_FEITO_AQUI.md. Hoje
+o cliente não tem o mesmo dropdown de usuário que o worker já tem (Prompts 12-14); "Meu Perfil"
+e "Sair" (ou equivalente) ainda aparecem soltos na barra de navegação horizontal do cliente.
+Implemente:
+
+1. DROPDOWN NO NOME DO CLIENTE — no canto superior direito, ao clicar no nome do cliente logado,
+   abra um dropdown com exatamente duas opções: "Meu Perfil" e "Sair" — SEM "Portfólio" (isso é
+   exclusivo do worker). Reaproveite o mesmo componente/padrão já implementado para o dropdown
+   do worker (mesmo comportamento de abrir/fechar, mesmo estilo visual — fonte, cores,
+   espaçamento, sombra).
+
+2. "MEU PERFIL" DO CLIENTE — se essa tela ainda não existir para o cliente, crie-a replicando a
+   estrutura da tela "Meu Perfil" do worker: bloco "Dados de cadastro" (ID de cadastro, Nome,
+   Sobrenome, CPF, E-mail — com Nome/Sobrenome/E-mail editáveis e CPF/ID de cadastro travados,
+   conforme Prompt 13) + bloco de Endereço e Foto de perfil editável (CEP com autopreenchimento,
+   Logradouro, Número, Complemento, Bairro, Cidade, Estado — Prompt 11). NÃO inclua o campo
+   "Documento de verificação" — isso é exigido só do worker (Prompt 11, item 6). Se a tela já
+   existir só que solta em outro lugar do menu, mova o link dela para dentro do dropdown, sem
+   duplicar a tela.
+
+3. REMOVER DUPLICAÇÃO NA BARRA SUPERIOR — depois do dropdown funcionando, tire "Meu Perfil" e
+   "Sair" (ou qualquer link equivalente) de onde quer que apareçam soltos na barra de navegação
+   horizontal do cliente hoje — eles devem existir SOMENTE dentro do dropdown do nome, não
+   duplicados em nenhum outro lugar da tela. Confira também o menu do worker (Prompts 12-14) e
+   garanta que "Meu Perfil", "Portfólio" e "Sair" também aparecem só dentro do dropdown dele, sem
+   duplicação na barra horizontal.
+
+4. MANTER A IDENTIDADE VISUAL JÁ EXISTENTE — sem introduzir fonte, cor ou padrão visual novo;
+   reaproveite os componentes que já existem no projeto.
+
+Ao final, me mostre um print da barra superior do cliente com o dropdown aberto (mostrando "Meu
+Perfil" e "Sair"), e confirme que esses dois itens não aparecem mais soltos fora do dropdown —
+nem no cliente, nem no worker.
+```
+
+---
+
+## Prompt 16 — Reorganizar o menu do ADMIN em um dropdown com grupos (Clientes / Workers / Sair)
+
+```
+Ajuste na área do ADMIN — já documentado na Seção 3.10 do CONTEXTO_REGRAS_FEITO_AQUI.md. Hoje
+todos os itens do painel admin estão soltos na barra de navegação horizontal. Precisam ir para
+dentro de um dropdown no nome do admin logado (canto superior direito), igual ao padrão já
+implementado para cliente e worker (Prompts 12-15), só que com uma estrutura em DOIS NÍVEIS
+(grupos com subitens, não uma lista plana). A estrutura final deve ser:
+
+- Clientes (grupo)
+  - Perfil
+  - Strikes
+- Workers (grupo)
+  - Perfil
+  - Aprovar Perfil
+  - Portfólio
+  - Strikes
+  - Repasses
+  - Disputas
+- Sair (item solto, fora dos dois grupos)
+
+Implemente:
+
+1. DROPDOWN COM GRUPOS EXPANSÍVEIS — ao clicar no nome do admin, abra o dropdown com "Clientes" e
+   "Workers" como grupos expansíveis (acordeão ou submenu — use o padrão que for mais simples de
+   implementar dado o componente de dropdown que já existe no projeto) contendo os subitens
+   listados acima, e "Sair" como item solto ao final, fora dos grupos.
+
+2. ANTES DE LIGAR OS LINKS, FAÇA UM INVENTÁRIO — investigue o que já existe hoje no painel admin
+   (rotas atuais da barra horizontal) antes de remover ou religar qualquer coisa. Pelo que já
+   sabemos que existe e funciona:
+   - A fila de aprovação/verificação de documento do worker (onde o admin muda o status do
+     documento para aprovado/rejeitado — Prompt 11 item 6) — ligue "Workers > Aprovar Perfil" a
+     essa página.
+   - A fila de disputas mediadas (Prompt 7) — ligue "Workers > Disputas" a essa página.
+   - A fila de strikes/contestação (Prompts 7 e 9) — ligue "Workers > Strikes" a essa página,
+     filtrando por strikes de worker se o filtro já existir ou for simples de adicionar; senão,
+     aponte para a fila geral por enquanto e me avise que o filtro ainda não existe.
+   - Se existir uma fila de strikes/contestação de CLIENTE (separada ou pelo menos filtrável),
+     ligue "Clientes > Strikes" a ela da mesma forma; senão, aponte para a mesma fila geral usada
+     em "Workers > Strikes" por enquanto.
+
+3. "AGUARDAR PERFIL" MUDA O TÍTULO DA PÁGINA — a página de aprovação de documento do worker
+   (destino de "Workers > Aprovar Perfil") deve exibir o título "Aprovar Workers" na tela (não
+   "Workers" nem qualquer outro texto que esteja lá hoje). Só o título muda — a funcionalidade da
+   página continua a mesma.
+
+4. ITENS AINDA SEM PÁGINA REAL = PLACEHOLDER "EM CONSTRUÇÃO" — os itens que ainda não têm
+   funcionalidade construída (Clientes > Perfil, Workers > Perfil, Workers > Portfólio, Workers >
+   Repasses, e Clientes > Strikes SE não existir fila equivalente) devem linkar para uma página
+   simples com uma mensagem tipo "Esta área está em construção — disponível em breve", só para o
+   link não quebrar (sem 404). NÃO construa a funcionalidade completa desses itens agora — isso
+   fica para prompts futuros (a área de Clientes completa, com listagem e busca por nome/CPF, e a
+   visão analítica/sintética de Workers, serão pedidas depois).
+
+5. REMOVER TUDO DA BARRA HORIZONTAL — depois que o dropdown estiver funcionando com todos os
+   itens, a barra de navegação horizontal do admin deve ficar vazia de links de navegação (só o
+   nome do admin com o dropdown deve restar no canto superior direito, igual ao padrão de cliente
+   e worker).
+
+6. MANTER A IDENTIDADE VISUAL JÁ EXISTENTE — mesma fonte, cores e estilo de componentes do resto
+   do protótipo; reaproveite o componente de dropdown/acordeão que fizer mais sentido dentro do
+   que já existe no projeto, sem introduzir uma biblioteca ou padrão visual novo.
+
+Ao final, me mostre: (a) um print do dropdown do admin aberto com os dois grupos expandidos, (b)
+a lista de quais subitens já ligam para páginas reais existentes vs. quais são placeholder "em
+construção", e (c) confirme que a barra horizontal do admin não tem mais nenhum link solto.
+```
+
+---
+
 ## Prompts extras (opcionais, use quando fizer sentido)
 
 ### Gerar uma versão de demonstração publicável

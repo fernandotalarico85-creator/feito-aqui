@@ -1,10 +1,8 @@
 import UserMenuDropdown, { UserMenuLink } from "@/components/UserMenuDropdown";
 
 /**
- * Menu do usuário logado (Prompts 11, 12 e 15) — "Meu Perfil", "Portfólio" e "Sair"
- * dentro do dropdown do nome, em vez de itens soltos na barra de navegação horizontal.
- * "Meu Perfil" (cadastro/endereço) e "Portfólio" (galeria de fotos) são telas/rotas
- * separadas — não compartilham formulário.
+ * Menu do usuário logado (Prompt 15) — mesmo padrão do dropdown do worker (Prompt 12),
+ * só que com "Meu Perfil" e "Sair", sem "Portfólio" (exclusivo do worker).
  */
 export default function UserMenu({
   nome,
@@ -15,8 +13,7 @@ export default function UserMenu({
 }) {
   return (
     <UserMenuDropdown label={nome}>
-      <UserMenuLink href="/worker/perfil">Meu Perfil</UserMenuLink>
-      <UserMenuLink href="/worker/portfolio">Portfólio</UserMenuLink>
+      <UserMenuLink href="/cliente/perfil">Meu Perfil</UserMenuLink>
       <form action={sairAction}>
         <button
           type="submit"
