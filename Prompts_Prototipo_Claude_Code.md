@@ -369,6 +369,141 @@ final do ID gerado, e onde ficou a lógica de autopreenchimento por CEP.
 
 ---
 
+## Prompt 12 — Corrigir menu do worker: "Meu Perfil" e "Portfólio" são telas separadas
+
+```
+Ajuste no menu/navegação do worker — correção do item 7 do Prompt 11. Hoje, ao clicar no nome
+do usuário (ex.: "Roberto Alves") no canto superior direito, aparecem só dois itens: "Meu
+Portfólio" e "Sair". E a tela que abre em "Meu Portfólio" mostra os dados de cadastro (ID,
+Nome, Sobrenome, CPF, E-mail, Documento de verificação — somente leitura) e o bloco de Endereço
+e foto de perfil (editável). Isso está errado: essas duas coisas precisam ser TELAS SEPARADAS.
+
+Implemente:
+
+1. MENU DO WORKER COM TRÊS ITENS — no menu abaixo do nome do usuário logado (ex.: "Roberto
+   Alves"), mostre três opções: "Meu Perfil", "Portfólio" e "Sair" (nessa ordem).
+
+2. "MEU PERFIL" = a tela de cadastro que já existe hoje — mova para cá exatamente o que hoje
+   aparece em "Meu Portfólio": o bloco "Dados de cadastro" (ID de cadastro, Nome, Sobrenome,
+   CPF, E-mail, Documento de verificação — somente leitura, sem poder editar, como já está) e o
+   bloco "Endereço e foto de perfil" (CEP com autopreenchimento, Logradouro, Número,
+   Complemento, Bairro, Cidade, Estado, trocar foto de perfil — editável, como já está). Nenhuma
+   regra de negócio muda aqui, só o nome/local da tela: de "Meu Portfólio" para "Meu Perfil".
+
+3. "PORTFÓLIO" = uma tela separada e nova (ou já existente em outro lugar do app — confira antes
+   de recriar) com o portfólio público de fotos antes/depois do worker, usado hoje na
+   vitrine/perfil público que o cliente vê ao avaliar workers (Seções 7 e 8 do plano) e onde as
+   fotos do "depois" enviadas na conclusão do serviço (Prompt 10) devem aparecer quando o worker
+   optar por publicá-las. Se essa tela de portfólio (galeria de fotos) ainda não existe de fato
+   no protótipo, crie uma versão simples: grid de fotos com legenda opcional, sem precisar de
+   edição/exclusão avançada por enquanto.
+
+4. CONFIRME QUE NADA MAIS QUEBROU — os links "Pedidos recebidos", "Meus orçamentos", "Meus
+   ganhos", "Agenda", "Destaque", "Strikes" continuam como estão hoje na barra de navegação
+   horizontal; a única mudança é o menu do nome do usuário passar a ter três itens em vez de
+   dois, e a separação de conteúdo entre "Meu Perfil" (cadastro/endereço/foto) e "Portfólio"
+   (galeria de fotos de trabalhos).
+
+5. MANTER A IDENTIDADE VISUAL JÁ EXISTENTE — a tela nova de "Portfólio" (e qualquer ajuste na
+   tela "Meu Perfil") precisa usar exatamente a mesma fonte, paleta de cores, espaçamentos,
+   estilo de card/borda/sombra e componentes (botões, inputs, badges) já usados no restante do
+   protótipo hoje — não crie nem importe uma fonte, cor ou padrão visual novo. Reaproveite os
+   componentes/classes de estilo que já existem no projeto em vez de estilizar do zero, para que
+   as duas telas pareçam que sempre fizeram parte do mesmo app.
+
+Ao final, me mostre um print de cada uma das duas telas ("Meu Perfil" e "Portfólio") já
+separadas, e confirme que reaproveitou os estilos existentes (não criou fonte/cor nova).
+```
+
+---
+
+## Prompt 13 — Liberar edição de Nome, Sobrenome e E-mail (só CPF e ID continuam travados)
+
+```
+Ajuste na tela "Meu Perfil" (cliente e worker), correção do Prompt 11 item 4 — já documentado
+na Seção 3.9 do CONTEXTO_REGRAS_FEITO_AQUI.md. Confirmando também: a tela de cadastro (bloco
+"Dados de cadastro" + bloco "Endereço e foto de perfil") continua em "Meu Perfil", separada de
+"Portfólio" (galeria de fotos), exatamente como implementado no Prompt 12 — não mude isso agora.
+
+O que muda é quais campos podem ser editados:
+
+1. LIBERAR EDIÇÃO DE NOME, SOBRENOME E E-MAIL — hoje esses três campos estão em modo somente
+   leitura no bloco "Dados de cadastro". Mova Nome, Sobrenome e E-mail para o bloco editável
+   (junto com Endereço e Foto de perfil) e permita que o próprio cliente ou worker altere esses
+   três campos a qualquer momento, salvando normalmente pelo botão "Salvar alterações". Se
+   e-mail for usado também como login, valide duplicidade (não permitir trocar para um e-mail já
+   cadastrado por outro usuário) e mantenha a sessão ativa após a troca.
+
+2. MANTER CPF E ID DE CADASTRO TRAVADOS — CPF e ID de cadastro (ex.: W00000001) continuam
+   permanentemente bloqueados para edição pelo usuário, exibidos como somente leitura no bloco
+   "Dados de cadastro" (mesmo texto de aviso que já existe: "Esses dados não podem ser alterados
+   no protótipo — fale com um administrador se precisar corrigir algo.").
+
+3. RESULTADO ESPERADO NA TELA — o bloco "Dados de cadastro" passa a ter só dois campos:
+   ID de cadastro e CPF (somente leitura). O bloco de baixo (hoje "Endereço e foto de perfil")
+   passa a se chamar algo como "Dados editáveis" ou similar e reúne: Nome, Sobrenome, E-mail,
+   CEP (com autopreenchimento, Prompt 11), Logradouro, Número, Complemento, Bairro, Cidade,
+   Estado e Foto de perfil.
+
+4. MANTER A IDENTIDADE VISUAL JÁ EXISTENTE — ao mover Nome, Sobrenome e E-mail para o bloco
+   editável, use exatamente a mesma fonte, cores, espaçamento e estilo de input/label já usados
+   nos campos de Endereço logo abaixo (e no resto do protótipo) — não introduza um estilo visual
+   diferente para os campos que estão migrando de somente leitura para editável.
+
+Ao final, me mostre um print da tela "Meu Perfil" atualizada, e confirme que o estilo dos campos
+novos (Nome, Sobrenome, E-mail) ficou idêntico ao dos campos de Endereço já existentes.
+```
+
+---
+
+## Prompt 14 — "Portfólio" ainda é uma cópia do formulário de endereço: separar de verdade
+
+```
+Os Prompts 12 e 13 não ficaram do jeito certo. Hoje, ao navegar para "Portfólio" no menu do
+worker, a página abre com o título "Meu Portfólio" mas o CONTEÚDO é quase idêntico à tela "Meu
+Perfil": mostra o mesmo card "Endereço e foto de perfil" (CEP, Logradouro, Número, Complemento,
+Bairro, Cidade, Estado, trocar foto, botão "Salvar alterações"), e tem um rótulo "Portfólio"
+solto boiando ao lado do título do card, sem função nenhuma — não existe nenhuma galeria de
+fotos de trabalho em lugar nenhum do app. Ou seja, "Meu Perfil" e "Portfólio" viraram duas
+rotas que renderizam basicamente a mesma coisa, só com o título da página trocado. Corrija de
+verdade:
+
+1. ROTAS E COMPONENTES DE FATO SEPARADOS — "Meu Perfil" e "Portfólio" precisam ser duas
+   páginas/rotas com componentes próprios, sem compartilhar o formulário de endereço. "Meu
+   Perfil" continua exatamente como está hoje (Dados de cadastro + bloco editável de
+   Nome/Sobrenome/E-mail/Endereço/Foto, dos Prompts 11-13). "Portfólio" precisa ser reescrita do
+   zero como a galeria de fotos antes/depois do worker — remova qualquer campo de
+   CEP/Logradouro/Número/Bairro/Cidade/Estado/"Salvar alterações" dessa tela, isso não pertence
+   ao Portfólio.
+
+2. CONTEÚDO REAL DA TELA "PORTFÓLIO" — grid/lista de fotos de trabalhos concluídos, cada item
+   mostrando a foto, e se fizer sentido uma legenda curta (ex.: categoria do serviço ou data).
+   Puxe as fotos que já existem no banco associadas ao worker (fotos de portfólio do cadastro do
+   worker — Prompt 3/Seção 8 — e as fotos do "depois" publicadas na conclusão do serviço —
+   Prompt 10). Se hoje não existe nenhuma foto de exemplo no seed, adicione 2-3 fotos fictícias
+   (placeholder) só para a tela não ficar vazia na demonstração.
+
+3. REMOVER O RÓTULO "PORTFÓLIO" SOLTO — encontre e apague esse elemento de texto/badge
+   "Portfólio" que hoje aparece boiando ao lado do título "Endereço e foto de perfil" tanto em
+   "Meu Perfil" quanto em "Portfólio" — é sobra de uma implementação anterior malfeita do menu, e
+   não deve aparecer dentro do conteúdo de nenhuma das duas telas.
+
+4. "PORTFÓLIO" SÓ PARA WORKER — o item de menu "Portfólio" (e a rota correspondente) deve
+   aparecer e estar acessível somente para usuários do tipo worker. Cliente não deve ver esse
+   item no menu nem conseguir acessar a rota diretamente (redirecione ou bloqueie se tentar).
+
+5. MANTER A IDENTIDADE VISUAL JÁ EXISTENTE — a tela "Portfólio" reescrita deve usar a mesma
+   fonte, cores, espaçamento e estilo de card já usados no resto do protótipo (mesmo se o
+   conteúdo dela for completamente diferente do formulário de endereço).
+
+Antes de me mostrar o resultado, confira você mesmo as duas telas lado a lado e confirme que
+NENHUM campo de endereço aparece em "Portfólio" e que NENHUM grid de fotos aparece em "Meu
+Perfil" — são as duas coisas que estavam erradas até agora. Ao final, me mostre um print de
+cada tela.
+```
+
+---
+
 ## Prompts extras (opcionais, use quando fizer sentido)
 
 ### Gerar uma versão de demonstração publicável

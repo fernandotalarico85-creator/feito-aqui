@@ -2,20 +2,8 @@ import Image from "next/image";
 import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { listarCategorias } from "@/lib/triagem";
-import {
-  listarPortfolioFeed,
-  listarBookingsElegiveisParaPortfolio,
-  listarFotosServicoNaoPublicadas,
-} from "@/lib/portfolio";
-import PortfolioFeed from "@/components/PortfolioFeed";
 import EnderecoCadastroFields from "@/components/EnderecoCadastroFields";
-import {
-  atualizarPerfilAction,
-  atualizarEnderecoWorkerAction,
-  adicionarPortfolioAction,
-  publicarFotoServicoAction,
-} from "./actions";
-import AdicionarPortfolioForm from "./AdicionarPortfolioForm";
+import { atualizarPerfilAction, atualizarDadosEditaveisWorkerAction } from "./actions";
 
 const DOCUMENTO_STATUS_LABEL: Record<string, string> = {
   PENDENTE: "Em análise",
@@ -31,9 +19,8 @@ const DOCUMENTO_STATUS_CLASSE: Record<string, string> = {
 
 const MENSAGENS_ERRO: Record<string, string> = {
   dados_invalidos: "Preencha bio, região de atendimento e selecione ao menos uma categoria.",
-  sem_foto: "Selecione ao menos a foto \"antes\" para adicionar ao portfólio.",
-  obra_invalida: "Selecione uma obra concluída sua que ainda não esteja no portfólio.",
-  endereco_invalido: "Preencha todos os campos obrigatórios do endereço.",
+  dados_editaveis_invalidos: "Preencha nome, sobrenome, e-mail e todos os campos obrigatórios do endereço.",
+  email_em_uso: "Esse e-mail já está sendo usado por outra conta.",
 };
 
 export default async function PerfilWorkerPage({
@@ -49,18 +36,12 @@ export default async function PerfilWorkerPage({
     include: { categorias: true },
   });
 
-  const [categorias, portfolioFeed, bookingsElegiveis, fotosNaoPublicadas] = await Promise.all([
-    listarCategorias(),
-    listarPortfolioFeed(worker.id),
-    listarBookingsElegiveisParaPortfolio(worker.id),
-    listarFotosServicoNaoPublicadas(worker.id),
-  ]);
-
+  const categorias = await listarCategorias();
   const categoriaIdsAtuais = new Set(worker.categorias.map((c) => c.id));
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-xl font-semibold text-stone-900">Meu Portfólio</h1>
+      <h1 className="text-xl font-semibold text-stone-900">Meu Perfil</h1>
 
       {params.erro && (
         <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -83,14 +64,8 @@ export default async function PerfilWorkerPage({
         <dl className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
           <dt className="text-stone-500">ID de cadastro</dt>
           <dd className="text-right font-mono text-stone-900">{usuario.idCadastro}</dd>
-          <dt className="text-stone-500">Nome</dt>
-          <dd className="text-right text-stone-900">{usuario.nome}</dd>
-          <dt className="text-stone-500">Sobrenome</dt>
-          <dd className="text-right text-stone-900">{usuario.sobrenome}</dd>
           <dt className="text-stone-500">CPF</dt>
           <dd className="text-right text-stone-900">{usuario.cpf}</dd>
-          <dt className="text-stone-500">E-mail</dt>
-          <dd className="text-right text-stone-900">{usuario.email}</dd>
           <dt className="text-stone-500">Documento de verificação</dt>
           <dd className="text-right">
             <span
@@ -103,8 +78,10 @@ export default async function PerfilWorkerPage({
       </section>
 
       <section className="mt-6 rounded-lg border border-stone-200 bg-white p-4">
-        <h2 className="text-sm font-semibold text-stone-900">Endereço e foto de perfil</h2>
-        <p className="mt-1 text-xs text-stone-500">Esses dois você pode atualizar quando quiser.</p>
+        <h2 className="text-sm font-semibold text-stone-900">Dados editáveis</h2>
+        <p className="mt-1 text-xs text-stone-500">
+          Nome, sobrenome, e-mail, endereço e foto de perfil você pode atualizar quando quiser.
+        </p>
 
         {usuario.fotoPerfilUrl && (
           <div className="relative mt-3 h-20 w-20 overflow-hidden rounded-full">
@@ -112,7 +89,47 @@ export default async function PerfilWorkerPage({
           </div>
         )}
 
-        <form action={atualizarEnderecoWorkerAction} className="mt-3 flex flex-col gap-4">
+        <form action={atualizarDadosEditaveisWorkerAction} className="mt-3 flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-stone-700" htmlFor="nome">
+                Nome
+              </label>
+              <input
+                id="nome"
+                name="nome"
+                defaultValue={usuario.nome}
+                required
+                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700" htmlFor="sobrenome">
+                Sobrenome
+              </label>
+              <input
+                id="sobrenome"
+                name="sobrenome"
+                defaultValue={usuario.sobrenome}
+                required
+                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700" htmlFor="email">
+              E-mail
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              defaultValue={usuario.email}
+              required
+              className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+          </div>
+
           <EnderecoCadastroFields
             defaultValues={{
               logradouro: worker.enderecoLogradouro,
@@ -196,57 +213,6 @@ export default async function PerfilWorkerPage({
             Salvar alterações
           </button>
         </form>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold text-stone-900">Portfólio</h2>
-        <p className="mt-1 text-xs text-stone-500">
-          Upload local — os arquivos ficam salvos em public/uploads neste protótipo.
-        </p>
-
-        {fotosNaoPublicadas.length > 0 && (
-          <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3">
-            <p className="text-xs font-semibold text-amber-800">
-              Fotos de serviços concluídos ainda não publicadas
-            </p>
-            <p className="mt-1 text-xs text-amber-700">
-              Enviadas na conclusão do serviço (Seção 3.8) — publique quando quiser, sem
-              precisar reenviar nada.
-            </p>
-            <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {fotosNaoPublicadas.map((foto) => (
-                <li key={foto.id} className="overflow-hidden rounded-md border border-stone-200 bg-white">
-                  <div className="relative aspect-square">
-                    <Image src={foto.url} alt="Foto do resultado" fill unoptimized className="object-cover" />
-                  </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-stone-700">
-                      {foto.booking.budget.serviceRequest.category.nome}
-                    </p>
-                    <p className="text-xs text-stone-400">
-                      {foto.booking.budget.serviceRequest.address.bairro}
-                    </p>
-                    <form action={publicarFotoServicoAction} className="mt-2">
-                      <input type="hidden" name="servicePhotoId" value={foto.id} />
-                      <button
-                        type="submit"
-                        className="w-full rounded-md bg-stone-900 px-2 py-1 text-xs font-medium text-white hover:bg-stone-700"
-                      >
-                        Publicar no portfólio
-                      </button>
-                    </form>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <AdicionarPortfolioForm action={adicionarPortfolioAction} bookingsElegiveis={bookingsElegiveis} />
-
-        <div className="mt-5">
-          <PortfolioFeed items={portfolioFeed} />
-        </div>
       </section>
     </div>
   );

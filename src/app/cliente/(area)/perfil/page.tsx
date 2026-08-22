@@ -5,7 +5,8 @@ import EnderecoCadastroFields from "@/components/EnderecoCadastroFields";
 import { atualizarPerfilClienteAction } from "./actions";
 
 const MENSAGENS_ERRO: Record<string, string> = {
-  dados_invalidos: "Preencha todos os campos obrigatórios do endereço.",
+  dados_invalidos: "Preencha nome, sobrenome, e-mail e todos os campos obrigatórios do endereço.",
+  email_em_uso: "Esse e-mail já está sendo usado por outra conta.",
 };
 
 export default async function PerfilClientePage({
@@ -39,20 +40,16 @@ export default async function PerfilClientePage({
         <dl className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
           <dt className="text-stone-500">ID de cadastro</dt>
           <dd className="text-right font-mono text-stone-900">{usuario.idCadastro}</dd>
-          <dt className="text-stone-500">Nome</dt>
-          <dd className="text-right text-stone-900">{usuario.nome}</dd>
-          <dt className="text-stone-500">Sobrenome</dt>
-          <dd className="text-right text-stone-900">{usuario.sobrenome}</dd>
           <dt className="text-stone-500">CPF</dt>
           <dd className="text-right text-stone-900">{usuario.cpf}</dd>
-          <dt className="text-stone-500">E-mail</dt>
-          <dd className="text-right text-stone-900">{usuario.email}</dd>
         </dl>
       </section>
 
       <section className="mt-6 rounded-lg border border-stone-200 bg-white p-4">
-        <h2 className="text-sm font-semibold text-stone-900">Endereço e foto de perfil</h2>
-        <p className="mt-1 text-xs text-stone-500">Esses dois você pode atualizar quando quiser.</p>
+        <h2 className="text-sm font-semibold text-stone-900">Dados editáveis</h2>
+        <p className="mt-1 text-xs text-stone-500">
+          Nome, sobrenome, e-mail, endereço e foto de perfil você pode atualizar quando quiser.
+        </p>
 
         {usuario.fotoPerfilUrl && (
           <div className="relative mt-3 h-20 w-20 overflow-hidden rounded-full">
@@ -61,6 +58,46 @@ export default async function PerfilClientePage({
         )}
 
         <form action={atualizarPerfilClienteAction} className="mt-3 flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-stone-700" htmlFor="nome">
+                Nome
+              </label>
+              <input
+                id="nome"
+                name="nome"
+                defaultValue={usuario.nome}
+                required
+                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700" htmlFor="sobrenome">
+                Sobrenome
+              </label>
+              <input
+                id="sobrenome"
+                name="sobrenome"
+                defaultValue={usuario.sobrenome}
+                required
+                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700" htmlFor="email">
+              E-mail
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              defaultValue={usuario.email}
+              required
+              className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+          </div>
+
           <EnderecoCadastroFields
             defaultValues={{
               logradouro: cliente.enderecoLogradouro,

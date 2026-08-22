@@ -103,16 +103,21 @@ Implementado de verdade, com efeito real no banco de dados:
   `numeroOS` (`OS-AAMMDD-NNNNN`) e todo `Budget` um `numeroPO` (`PO-AAMMDD-NNNNN`) na
   criação — sequencial reinicia por dia, gerado atomicamente em `src/lib/numeracao.ts`.
   Visível em toda tela de cliente/worker/admin que lista ou detalha um pedido/orçamento.
-- **Cadastro completo com ID sequencial** (Seção 3.11): nome, sobrenome, CPF, endereço
+- **Cadastro completo com ID sequencial** (Seção 3.9): nome, sobrenome, CPF, endereço
   completo (com dropdown de UF e autopreenchimento por CEP via ViaCEP) e foto de perfil
   opcional, para cliente e worker. Cada cadastro ganha um `idCadastro` sequencial e único
   (`C00000001...` / `W00000001...`, gerado em `src/lib/numeracao.ts`), visível no próprio
-  perfil e no painel admin. Depois de criado, só endereço e foto de perfil podem ser
-  editados — o resto fica somente leitura em `/cliente/perfil` e `/worker/perfil`.
-- **Documento de verificação de identidade do worker** (Seção 3.11): upload obrigatório no
+  perfil e no painel admin. Depois de criado, nome/sobrenome/e-mail/endereço/foto de perfil
+  podem ser editados a qualquer momento em `/cliente/perfil` e `/worker/perfil` — só CPF e
+  ID de cadastro ficam permanentemente bloqueados.
+- **Documento de verificação de identidade do worker** (Seção 3.9): upload obrigatório no
   cadastro (CNH, RG com CPF, ou RG + CPF separados), com `documentoStatus` que o admin
   aprova/rejeita manualmente em `/admin/workers` — sem OCR, revisão separada da verificação
   geral do worker (Seção 3.7).
+- **Menu do worker com 3 itens** (Seção 3.9): "Meu Perfil" (cadastro/endereço/foto) e
+  "Portfólio" (galeria de fotos antes/depois, em `/worker/portfolio`) são telas e rotas
+  separadas — não compartilham formulário — dentro do dropdown do nome do usuário, junto
+  com "Sair". O item "Portfólio" só aparece pra worker.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

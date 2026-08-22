@@ -111,8 +111,8 @@ export async function simularPassagemDeTempoAction(formData: FormData) {
 /**
  * Marcar conclusão (Seção 3.8): exige pelo menos 1 foto do "depois" — sem ela, o
  * status não avança e a parcela final do repasse nunca chega a ficar em jogo. A foto
- * pode ser publicada no portfólio na hora (checkbox) ou depois, a qualquer momento,
- * em "Meu perfil > Portfólio". Marcar conclusão NÃO libera a parcela final sozinho:
+ * pode ser publicada no portfólio na hora (checkbox) ou depois, a qualquer momento, na
+ * tela "Portfólio". Marcar conclusão NÃO libera a parcela final sozinho:
  * fica "aguardando confirmação do cliente" até ele confirmar, contestar, ou o prazo
  * de confirmação automática se esgotar (ver src/lib/confirmacaoConclusao.ts).
  */
@@ -189,7 +189,7 @@ export async function fazerCheckOutAction(formData: FormData) {
   revalidatePath(`/cliente/bookings/${bookingId}`);
   revalidatePath("/cliente/pedidos");
   revalidatePath("/worker/ganhos");
-  revalidatePath("/worker/perfil");
+  revalidatePath("/worker/portfolio");
 }
 
 /**

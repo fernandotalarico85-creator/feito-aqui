@@ -34,15 +34,19 @@ export async function atualizarPerfilAction(formData: FormData) {
 }
 
 /**
- * Edição de perfil do worker (Prompt 11) — só endereço e foto de perfil podem ser
- * alterados depois do cadastro; nome/sobrenome/CPF/e-mail ficam somente leitura.
+ * Edição de perfil do worker (Prompts 11 e 13) — nome, sobrenome, e-mail, endereço e
+ * foto de perfil podem ser alterados a qualquer momento; só CPF e ID de cadastro ficam
+ * permanentemente bloqueados, sem tela de edição no protótipo.
  */
-export async function atualizarEnderecoWorkerAction(formData: FormData) {
+export async function atualizarDadosEditaveisWorkerAction(formData: FormData) {
   const usuario = await exigirUsuario("WORKER");
   const worker = await prisma.workerProfile.findUniqueOrThrow({
     where: { userId: usuario.id },
   });
 
+  const nome = String(formData.get("nome") ?? "").trim();
+  const sobrenome = String(formData.get("sobrenome") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const logradouro = String(formData.get("logradouro") ?? "").trim();
   const numero = String(formData.get("numero") ?? "").trim();
   const complemento = String(formData.get("complemento") ?? "").trim() || null;
@@ -52,13 +56,32 @@ export async function atualizarEnderecoWorkerAction(formData: FormData) {
   const cep = String(formData.get("cep") ?? "").trim();
   const fotoPerfil = formData.get("fotoPerfil") as File | null;
 
-  if (!logradouro || !numero || !bairro || !cidade || !ehUfValida(estado) || !cep) {
-    redirect("/worker/perfil?erro=endereco_invalido");
+  if (
+    !nome ||
+    !sobrenome ||
+    !email ||
+    !logradouro ||
+    !numero ||
+    !bairro ||
+    !cidade ||
+    !ehUfValida(estado) ||
+    !cep
+  ) {
+    redirect("/worker/perfil?erro=dados_editaveis_invalidos");
+  }
+
+  if (email !== usuario.email) {
+    const emailExistente = await prisma.user.findUnique({ where: { email } });
+    if (emailExistente) redirect("/worker/perfil?erro=email_em_uso");
   }
 
   const fotoPerfilUrl = await salvarUpload(fotoPerfil);
 
   await prisma.$transaction([
+    prisma.user.update({
+      where: { id: usuario.id },
+      data: { nome, sobrenome, email, ...(fotoPerfilUrl ? { fotoPerfilUrl } : {}) },
+    }),
     prisma.workerProfile.update({
       where: { id: worker.id },
       data: {
@@ -71,101 +94,7 @@ export async function atualizarEnderecoWorkerAction(formData: FormData) {
         enderecoCep: cep,
       },
     }),
-    ...(fotoPerfilUrl
-      ? [prisma.user.update({ where: { id: usuario.id }, data: { fotoPerfilUrl } })]
-      : []),
   ]);
-
-  revalidatePath("/worker/perfil");
-}
-
-export async function adicionarPortfolioAction(formData: FormData) {
-  const usuario = await exigirUsuario("WORKER");
-  const worker = await prisma.workerProfile.findUniqueOrThrow({
-    where: { userId: usuario.id },
-  });
-
-  const origem = String(formData.get("origem") ?? "EXTERNO") === "PLATAFORMA" ? "PLATAFORMA" : "EXTERNO";
-  const fotoAntes = formData.get("fotoAntes") as File | null;
-  const fotoDepois = formData.get("fotoDepois") as File | null;
-
-  const fotoAntesUrl = await salvarUpload(fotoAntes);
-  if (!fotoAntesUrl) {
-    redirect("/worker/perfil?erro=sem_foto");
-  }
-  const fotoDepoisUrl = await salvarUpload(fotoDepois);
-
-  if (origem === "PLATAFORMA") {
-    const bookingId = String(formData.get("bookingId") ?? "");
-    // Só aceita bookings concluídos, do próprio worker, ainda sem post vinculado —
-    // evita que ele "empreste" a nota de uma obra de outro profissional.
-    const booking = await prisma.booking.findFirst({
-      where: {
-        id: bookingId,
-        status: "CONCLUIDO",
-        budget: { workerId: worker.id },
-        portfolioItem: null,
-      },
-    });
-    if (!booking) {
-      redirect("/worker/perfil?erro=obra_invalida");
-    }
-
-    await prisma.portfolioItem.create({
-      data: {
-        workerProfileId: worker.id,
-        origem: "PLATAFORMA",
-        bookingId: booking.id,
-        fotoAntesUrl,
-        fotoDepoisUrl,
-      },
-    });
-  } else {
-    const descricao = String(formData.get("descricao") ?? "").trim() || null;
-
-    await prisma.portfolioItem.create({
-      data: {
-        workerProfileId: worker.id,
-        origem: "EXTERNO",
-        fotoAntesUrl,
-        fotoDepoisUrl,
-        descricao,
-      },
-    });
-  }
-
-  revalidatePath("/worker/perfil");
-}
-
-/**
- * Promove uma foto de serviço (enviada no check-out, Seção 3.8) direto pro portfólio
- * — sem re-upload, já que a foto já está salva. Cobre a opção "publicar depois" do
- * momento da conclusão.
- */
-export async function publicarFotoServicoAction(formData: FormData) {
-  const usuario = await exigirUsuario("WORKER");
-  const worker = await prisma.workerProfile.findUniqueOrThrow({
-    where: { userId: usuario.id },
-  });
-
-  const servicePhotoId = String(formData.get("servicePhotoId") ?? "");
-
-  const foto = await prisma.servicePhoto.findFirst({
-    where: {
-      id: servicePhotoId,
-      booking: { status: "CONCLUIDO", budget: { workerId: worker.id }, portfolioItem: null },
-    },
-  });
-  if (!foto) redirect("/worker/perfil?erro=obra_invalida");
-
-  await prisma.portfolioItem.create({
-    data: {
-      workerProfileId: worker.id,
-      origem: "PLATAFORMA",
-      bookingId: foto.bookingId,
-      fotoDepoisUrl: foto.url,
-    },
-  });
 
   revalidatePath("/worker/perfil");
 }

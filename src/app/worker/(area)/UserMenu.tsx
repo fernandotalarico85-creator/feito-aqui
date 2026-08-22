@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 /**
- * Menu do usuário logado (Prompt 11) — clique no nome abre "Meu Portfólio" + "Sair",
- * em vez desses itens ficarem soltos na barra de navegação horizontal.
+ * Menu do usuário logado (Prompts 11 e 12) — clique no nome abre "Meu Perfil",
+ * "Portfólio" e "Sair", em vez desses itens ficarem soltos na barra de navegação
+ * horizontal. "Meu Perfil" (cadastro/endereço) e "Portfólio" (galeria de fotos) são
+ * telas/rotas separadas — não compartilham formulário.
  */
 export default function UserMenu({
   nome,
@@ -45,7 +47,14 @@ export default function UserMenu({
             onClick={() => setAberto(false)}
             className="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
           >
-            Meu Portfólio
+            Meu Perfil
+          </Link>
+          <Link
+            href="/worker/portfolio"
+            onClick={() => setAberto(false)}
+            className="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+          >
+            Portfólio
           </Link>
           <form action={sairAction}>
             <button
