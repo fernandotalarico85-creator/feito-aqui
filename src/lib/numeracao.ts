@@ -31,3 +31,19 @@ export async function gerarNumeroDocumento(tipo: "OS" | "PO"): Promise<string> {
 
   return `${tipo}-${data}-${String(sequencia.contador).padStart(5, "0")}`;
 }
+
+/**
+ * Gera o ID de cadastro sequencial (Prompt 11) — C00000001, C00000002... para
+ * cliente, W00000001, W00000002... para worker. Contador GLOBAL (nunca reinicia,
+ * diferente de gerarNumeroDocumento acima) — dois contadores independentes, um por
+ * tipo, na tabela SequenciaCadastro. Mesmo padrão de upsert atômico.
+ */
+export async function gerarIdCadastro(tipo: "C" | "W"): Promise<string> {
+  const sequencia = await prisma.sequenciaCadastro.upsert({
+    where: { tipo },
+    create: { tipo, contador: 1 },
+    update: { contador: { increment: 1 } },
+  });
+
+  return `${tipo}${String(sequencia.contador).padStart(8, "0")}`;
+}

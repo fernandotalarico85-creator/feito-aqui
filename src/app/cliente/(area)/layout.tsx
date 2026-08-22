@@ -23,6 +23,9 @@ export default async function ClienteLayout({
             <Link href="/cliente/carteira" className="text-stone-600 hover:text-stone-900">
               Minha carteira
             </Link>
+            <Link href="/cliente/perfil" className="text-stone-600 hover:text-stone-900">
+              Meu perfil
+            </Link>
             <Link
               href="/cliente/pedidos/novo"
               className="rounded-md bg-stone-900 px-3 py-1.5 font-medium text-white hover:bg-stone-700"

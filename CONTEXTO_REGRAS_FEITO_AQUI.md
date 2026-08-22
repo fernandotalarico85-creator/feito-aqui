@@ -20,12 +20,18 @@ plataforma cobra comissão. Vertical de lançamento do protótipo: **reforma/con
 
 ## 2. Entidades principais (modelo de dados sugerido)
 
-- **User** — campos base: id, nome, email, senha (hash), tipo (`cliente` | `worker` | `admin`), criadoEm.
-- **ClientProfile** — userId, endereço(s) salvos, carteira de créditos (tokens convertidos em R$).
-- **WorkerProfile** — userId, categorias de serviço (array), região de atendimento, bio,
-  portfólio (fotos antes/depois), status de verificação (`pendente` | `verificado`), nota média
-  recente, taxa de conclusão no prazo, taxa de comparecimento, tempo médio de resposta, volume de
-  serviços concluídos, elegívelParaTriagem (bool, corte de qualidade), destaquePago (bool + validade).
+- **User** — campos base: id (chave interna), idCadastro (formato `C00000001` para cliente /
+  `W00000001` para worker — prefixo + sequencial de 8 dígitos, ver 3.11), nome, sobrenome, cpf,
+  fotoPerfilUrl (opcional), email, senha (hash), tipo (`cliente` | `worker` | `admin`), criadoEm.
+- **ClientProfile** — userId, endereço de cadastro (rua, número, complemento, bairro, cidade,
+  estado — UF —, cep, ver 3.11), endereço(s) salvos por pedido (`Address[]`, endereço de obra —
+  diferente do endereço de cadastro acima), carteira de créditos (tokens convertidos em R$).
+- **WorkerProfile** — userId, endereço de cadastro (mesmo formato do ClientProfile, ver 3.11),
+  documento de verificação de identidade (tipo + arquivo(s) + status, ver 3.11), categorias de
+  serviço (array), região de atendimento, bio, portfólio (fotos antes/depois), status de
+  verificação (`pendente` | `verificado`), nota média recente, taxa de conclusão no prazo, taxa
+  de comparecimento, tempo médio de resposta, volume de serviços concluídos, elegívelParaTriagem
+  (bool, corte de qualidade), destaquePago (bool + validade).
 - **Agenda** — workerId, data, disponível (bool).
 - **ServiceRequest** (pedido do cliente) — numeroOS (ver 3.10), clienteId, descrição livre,
   categoria(s) sugeridas pela triagem, sub-serviços, janela de data desejada, status
@@ -155,8 +161,8 @@ Tabela simplificada de infrações para o protótipo:
   serviço" e enviar pelo menos 1 foto do "depois" (resultado) — sem essa foto, o status não
   avança para concluído. Fotos ficam em `ServicePhoto`, ligadas ao `Booking`.
 - No mesmo passo, o worker escolhe se publica a foto no portfólio público na hora ou adia a
-  decisão; se adiar, pode publicar depois a qualquer momento pelo próprio perfil ("Meu perfil
-  {'>'} Portfólio"), sem prazo — vira um `PortfolioItem` com `fotoAntesUrl` vazio.
+  decisão; se adiar, pode publicar depois a qualquer momento pelo próprio perfil ("Meu Portfólio",
+  ver 3.11), sem prazo — vira um `PortfolioItem` com `fotoAntesUrl` vazio.
 - Marcar conclusão NÃO libera o repasse sozinho: `Booking.statusConclusao` vira
   `aguardando_confirmacao_cliente` e um badge aparece na tela de pedidos do cliente. O
   repasse final (a parcela ligada à entrega, ver 3.1) só é processado depois que o cliente
@@ -203,11 +209,39 @@ Tabela simplificada de infrações para o protótipo:
 - Visível pro cliente, worker e admin em toda tela que lista ou detalha um pedido/orçamento
   (facilita busca e referência em disputas/suporte) — não é só um campo interno.
 
+### 3.11 Cadastro completo, ID sequencial e verificação de identidade (Prompt 11) `[padrão de protótipo, ajustável]` — implementado
+- Cadastro (cliente e worker) exige: e-mail, senha, nome, sobrenome, CPF, endereço completo
+  (rua, número, complemento, bairro, cidade, estado — dropdown com as 27 UFs do Brasil —, CEP) e
+  foto de perfil. Todos os campos são obrigatórios para concluir o cadastro, exceto a foto de
+  perfil (opcional).
+- Ao digitar o CEP, o formulário busca o endereço automaticamente na API pública ViaCEP
+  (`https://viacep.com.br/ws/{cep}/json/`) e pré-preenche rua, bairro, cidade e estado; número e
+  complemento continuam manuais. CEP inválido/não encontrado mostra uma mensagem, sem travar o
+  formulário — implementado em `src/components/EnderecoCadastroFields.tsx`.
+- Depois de criado, o cadastro só pode ser editado nos campos de ENDEREÇO e FOTO DE PERFIL — os
+  demais (nome, sobrenome, CPF, e-mail) ficam somente leitura em `/cliente/perfil` e
+  `/worker/perfil`, sem tela de edição.
+- ID de cadastro: gerado automaticamente na criação, formato `C` + 8 dígitos sequenciais para
+  cliente (ex.: `C00000001`) e `W` + 8 dígitos sequenciais para worker (ex.: `W00000001`) — dois
+  contadores independentes, um por tipo de usuário, que nunca reiniciam (diferente do contador
+  diário de OS/PO da Seção 3.10). Gerado em `src/lib/numeracao.ts` (`gerarIdCadastro`), via
+  upsert atômico numa tabela de contadores (`SequenciaCadastro`). Visível no perfil do usuário
+  (cliente e worker) e no painel admin de workers.
+- Verificação de documento (somente worker, obrigatório para concluir o cadastro): upload de um
+  dos conjuntos — CNH; ou RG que já mostra o CPF; ou RG e CPF como dois documentos separados
+  (`WorkerProfile.tipoDocumento`). Status de verificação de documento
+  (`documentoStatus`: `pendente` | `aprovado` | `rejeitado`) é distinto do status geral de
+  verificação do worker (Seção 3.7) — sem OCR/validação automática no protótipo, a aprovação é
+  manual pelo admin em `/admin/workers`.
+- Navegação: o item "Meu perfil" do worker foi renomeado para "Meu Portfólio" e saiu da barra de
+  navegação horizontal — agora fica dentro de um menu suspenso preso ao nome do usuário logado,
+  no canto superior direito, junto com "Sair" (`src/app/worker/(area)/UserMenu.tsx`).
+
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
 - Split de pagamento real / gateway de pagamento — simular com um status de pagamento mockado.
 - Verificação de antecedentes / KYC completo — só um campo de status `verificado` manual (admin
-  aprova).
+  aprova); a verificação de documento da Seção 3.11 também é manual, sem OCR.
 - IA generativa real de triagem — usar o formulário guiado descrito em 3.2.
 - Geofencing nativo mobile — usar navegador/web app responsivo.
 - Multi-idioma, notificações push, app nativo iOS/Android.

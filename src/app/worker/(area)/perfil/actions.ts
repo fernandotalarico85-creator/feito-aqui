@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { salvarUpload } from "@/lib/upload";
+import { ehUfValida } from "@/lib/uf";
 
 export async function atualizarPerfilAction(formData: FormData) {
   const usuario = await exigirUsuario("WORKER");
@@ -28,6 +29,52 @@ export async function atualizarPerfilAction(formData: FormData) {
       categorias: { set: categoriaIds.map((id) => ({ id })) },
     },
   });
+
+  revalidatePath("/worker/perfil");
+}
+
+/**
+ * Edição de perfil do worker (Prompt 11) — só endereço e foto de perfil podem ser
+ * alterados depois do cadastro; nome/sobrenome/CPF/e-mail ficam somente leitura.
+ */
+export async function atualizarEnderecoWorkerAction(formData: FormData) {
+  const usuario = await exigirUsuario("WORKER");
+  const worker = await prisma.workerProfile.findUniqueOrThrow({
+    where: { userId: usuario.id },
+  });
+
+  const logradouro = String(formData.get("logradouro") ?? "").trim();
+  const numero = String(formData.get("numero") ?? "").trim();
+  const complemento = String(formData.get("complemento") ?? "").trim() || null;
+  const bairro = String(formData.get("bairro") ?? "").trim();
+  const cidade = String(formData.get("cidade") ?? "").trim();
+  const estado = String(formData.get("estado") ?? "").trim().toUpperCase();
+  const cep = String(formData.get("cep") ?? "").trim();
+  const fotoPerfil = formData.get("fotoPerfil") as File | null;
+
+  if (!logradouro || !numero || !bairro || !cidade || !ehUfValida(estado) || !cep) {
+    redirect("/worker/perfil?erro=endereco_invalido");
+  }
+
+  const fotoPerfilUrl = await salvarUpload(fotoPerfil);
+
+  await prisma.$transaction([
+    prisma.workerProfile.update({
+      where: { id: worker.id },
+      data: {
+        enderecoLogradouro: logradouro,
+        enderecoNumero: numero,
+        enderecoComplemento: complemento,
+        enderecoBairro: bairro,
+        enderecoCidade: cidade,
+        enderecoEstado: estado,
+        enderecoCep: cep,
+      },
+    }),
+    ...(fotoPerfilUrl
+      ? [prisma.user.update({ where: { id: usuario.id }, data: { fotoPerfilUrl } })]
+      : []),
+  ]);
 
   revalidatePath("/worker/perfil");
 }

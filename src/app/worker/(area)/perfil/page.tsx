@@ -8,17 +8,32 @@ import {
   listarFotosServicoNaoPublicadas,
 } from "@/lib/portfolio";
 import PortfolioFeed from "@/components/PortfolioFeed";
+import EnderecoCadastroFields from "@/components/EnderecoCadastroFields";
 import {
   atualizarPerfilAction,
+  atualizarEnderecoWorkerAction,
   adicionarPortfolioAction,
   publicarFotoServicoAction,
 } from "./actions";
 import AdicionarPortfolioForm from "./AdicionarPortfolioForm";
 
+const DOCUMENTO_STATUS_LABEL: Record<string, string> = {
+  PENDENTE: "Em análise",
+  APROVADO: "Aprovado",
+  REJEITADO: "Rejeitado",
+};
+
+const DOCUMENTO_STATUS_CLASSE: Record<string, string> = {
+  PENDENTE: "bg-amber-100 text-amber-700",
+  APROVADO: "bg-emerald-100 text-emerald-700",
+  REJEITADO: "bg-red-100 text-red-700",
+};
+
 const MENSAGENS_ERRO: Record<string, string> = {
   dados_invalidos: "Preencha bio, região de atendimento e selecione ao menos uma categoria.",
   sem_foto: "Selecione ao menos a foto \"antes\" para adicionar ao portfólio.",
   obra_invalida: "Selecione uma obra concluída sua que ainda não esteja no portfólio.",
+  endereco_invalido: "Preencha todos os campos obrigatórios do endereço.",
 };
 
 export default async function PerfilWorkerPage({
@@ -45,7 +60,7 @@ export default async function PerfilWorkerPage({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-xl font-semibold text-stone-900">Meu perfil</h1>
+      <h1 className="text-xl font-semibold text-stone-900">Meu Portfólio</h1>
 
       {params.erro && (
         <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -58,6 +73,77 @@ export default async function PerfilWorkerPage({
           Perfil pendente de verificação por um administrador.
         </p>
       )}
+
+      <section className="mt-6 rounded-lg border border-stone-200 bg-white p-4">
+        <h2 className="text-sm font-semibold text-stone-900">Dados de cadastro</h2>
+        <p className="mt-1 text-xs text-stone-400">
+          Esses dados não podem ser alterados no protótipo — fale com um administrador se
+          precisar corrigir algo.
+        </p>
+        <dl className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
+          <dt className="text-stone-500">ID de cadastro</dt>
+          <dd className="text-right font-mono text-stone-900">{usuario.idCadastro}</dd>
+          <dt className="text-stone-500">Nome</dt>
+          <dd className="text-right text-stone-900">{usuario.nome}</dd>
+          <dt className="text-stone-500">Sobrenome</dt>
+          <dd className="text-right text-stone-900">{usuario.sobrenome}</dd>
+          <dt className="text-stone-500">CPF</dt>
+          <dd className="text-right text-stone-900">{usuario.cpf}</dd>
+          <dt className="text-stone-500">E-mail</dt>
+          <dd className="text-right text-stone-900">{usuario.email}</dd>
+          <dt className="text-stone-500">Documento de verificação</dt>
+          <dd className="text-right">
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${DOCUMENTO_STATUS_CLASSE[worker.documentoStatus]}`}
+            >
+              {DOCUMENTO_STATUS_LABEL[worker.documentoStatus]}
+            </span>
+          </dd>
+        </dl>
+      </section>
+
+      <section className="mt-6 rounded-lg border border-stone-200 bg-white p-4">
+        <h2 className="text-sm font-semibold text-stone-900">Endereço e foto de perfil</h2>
+        <p className="mt-1 text-xs text-stone-500">Esses dois você pode atualizar quando quiser.</p>
+
+        {usuario.fotoPerfilUrl && (
+          <div className="relative mt-3 h-20 w-20 overflow-hidden rounded-full">
+            <Image src={usuario.fotoPerfilUrl} alt="Foto de perfil" fill unoptimized className="object-cover" />
+          </div>
+        )}
+
+        <form action={atualizarEnderecoWorkerAction} className="mt-3 flex flex-col gap-4">
+          <EnderecoCadastroFields
+            defaultValues={{
+              logradouro: worker.enderecoLogradouro,
+              numero: worker.enderecoNumero,
+              complemento: worker.enderecoComplemento ?? "",
+              bairro: worker.enderecoBairro,
+              cidade: worker.enderecoCidade,
+              estado: worker.enderecoEstado,
+              cep: worker.enderecoCep,
+            }}
+          />
+          <div>
+            <label className="block text-xs font-medium text-stone-600" htmlFor="fotoPerfil">
+              Trocar foto de perfil (opcional)
+            </label>
+            <input
+              id="fotoPerfil"
+              name="fotoPerfil"
+              type="file"
+              accept="image/*"
+              className="mt-1 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="self-start rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+          >
+            Salvar alterações
+          </button>
+        </form>
+      </section>
 
       <section className="mt-6">
         <h2 className="text-sm font-semibold text-stone-900">Dados do perfil</h2>

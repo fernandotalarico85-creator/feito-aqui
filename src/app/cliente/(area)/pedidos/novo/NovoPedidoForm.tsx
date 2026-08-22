@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { criarPedidoAction } from "./actions";
+import { LISTA_UF } from "@/lib/uf";
 
 type Categoria = {
   id: string;
@@ -186,14 +187,18 @@ export default function NovoPedidoForm({
               defaultValue="São Paulo"
               className="rounded-md border border-stone-300 px-3 py-2 text-sm"
             />
-            <input
+            <select
               name="estado"
-              placeholder="UF"
               required
               defaultValue="SP"
-              maxLength={2}
               className="rounded-md border border-stone-300 px-3 py-2 text-sm"
-            />
+            >
+              {LISTA_UF.map((uf) => (
+                <option key={uf} value={uf}>
+                  {uf}
+                </option>
+              ))}
+            </select>
             <input
               name="cep"
               placeholder="CEP"

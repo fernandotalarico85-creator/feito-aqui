@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirUsuario } from "@/lib/auth";
 import { sairWorkerAction } from "./actions";
+import UserMenu from "./UserMenu";
 
 export default async function WorkerAreaLayout({
   children,
@@ -29,9 +30,6 @@ export default async function WorkerAreaLayout({
             <Link href="/worker/agenda" className="text-stone-600 hover:text-stone-900">
               Agenda
             </Link>
-            <Link href="/worker/perfil" className="text-stone-600 hover:text-stone-900">
-              Meu perfil
-            </Link>
             <Link href="/worker/destaque" className="text-stone-600 hover:text-stone-900">
               Destaque
             </Link>
@@ -39,12 +37,7 @@ export default async function WorkerAreaLayout({
               Strikes
             </Link>
             <span className="text-stone-400">|</span>
-            <span className="text-stone-500">{usuario.nome}</span>
-            <form action={sairWorkerAction}>
-              <button type="submit" className="text-stone-500 underline hover:text-stone-900">
-                Sair
-              </button>
-            </form>
+            <UserMenu nome={usuario.nome} sairAction={sairWorkerAction} />
           </nav>
         </div>
       </header>

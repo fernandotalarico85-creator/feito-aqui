@@ -313,6 +313,62 @@ libera depois da confirmação (ou do prazo esgotado).
 
 ---
 
+## Prompt 11 — Cadastro completo (endereço, CEP, documento, ID sequencial) e reorganização do menu
+
+```
+Ajustes na tela de cadastro/perfil do protótipo, já documentados na Seção 3.9 do
+CONTEXTO_REGRAS_FEITO_AQUI.md. Implemente:
+
+1. CAMPOS DE CADASTRO — para cliente e worker, o cadastro (e o modelo User/ClientProfile/
+   WorkerProfile) precisa reunir: e-mail, senha, nome, sobrenome, CPF, endereço completo (rua,
+   número, complemento, bairro, cidade, estado, CEP) e foto de perfil. Todos obrigatórios para
+   concluir o cadastro, EXCETO a foto de perfil (opcional). Ajuste o formulário de cadastro (e a
+   migration/schema do banco) para refletir isso — se já existirem usuários de seed sem esses
+   campos, preencha com dados fictícios plausíveis para não quebrar o seed.
+
+2. DROPDOWN DE ESTADO (UF) — o campo Estado deve ser uma lista suspensa com as 27 siglas de
+   unidade federativa do Brasil (AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR,
+   PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO), não um campo de texto livre.
+
+3. AUTOPREENCHIMENTO POR CEP — ao digitar/sair do campo CEP, consulte a API pública do ViaCEP
+   (`https://viacep.com.br/ws/{cep}/json/`, gratuita e sem chave) e preencha automaticamente rua,
+   bairro, cidade e estado a partir da resposta; número e complemento continuam sendo digitados
+   manualmente pelo usuário. Trate o caso de CEP inválido/não encontrado com uma mensagem clara,
+   sem travar o formulário.
+
+4. EDIÇÃO RESTRITA APÓS CADASTRO — na tela de edição de perfil (cliente e worker), só os campos
+   de ENDEREÇO e FOTO DE PERFIL podem ser alterados depois que o cadastro é criado. Os demais
+   campos (nome, sobrenome, CPF, e-mail) devem aparecer como somente leitura — não implemente uma
+   tela de alteração desses campos no protótipo.
+
+5. ID DE CADASTRO SEQUENCIAL — ao criar um novo cadastro, gere automaticamente um ID visível
+   (diferente da chave primária interna do banco, se preferir manter uma separada) no formato: `C`
+   + 8 dígitos sequenciais para cliente (ex.: C00000001, C00000002...) e `W` + 8 dígitos
+   sequenciais para worker (ex.: W00000001, W00000002...) — dois contadores independentes, um por
+   tipo. Mostre esse ID no perfil do usuário (e no painel admin, se fizer sentido, como referência
+   de busca).
+
+6. DOCUMENTO DE VERIFICAÇÃO (SOMENTE WORKER, OBRIGATÓRIO) — no cadastro do worker, exija o upload
+   de foto/arquivo de comprovação de identidade antes de considerar o cadastro completo. Aceite um
+   dos três formatos: (a) CNH; (b) RG que já mostra o CPF; ou (c) RG e CPF como dois uploads
+   separados — implemente como uma escolha do tipo de documento seguida do(s) campo(s) de upload
+   correspondente(s). Guarde o(s) arquivo(s) associado(s) ao WorkerProfile com um status de
+   verificação (ex.: `documentoStatus`: `pendente` | `aprovado` | `rejeitado`) — não precisa de
+   OCR/validação automática no protótipo, só o upload e um status que o admin possa mudar
+   manualmente no painel (Prompt 7).
+
+7. RENOMEAR E REPOSICIONAR "MEU PERFIL" → "MEU PORTFÓLIO" — no menu do worker, renomeie o item
+   "Meu perfil" para "Meu Portfólio", e mova esse link para ficar junto ao nome do usuário logado
+   no canto superior direito (perto de onde hoje aparece o nome, ex. "Roberto Alves"), em vez de
+   continuar como um item solto no meio da barra de navegação horizontal — pode virar um
+   menu/dropdown ao clicar no nome do usuário, com "Meu Portfólio" e "Sair" dentro dele.
+
+Ao final, me mostre o formulário de cadastro atualizado (print ou descrição das telas), o formato
+final do ID gerado, e onde ficou a lógica de autopreenchimento por CEP.
+```
+
+---
+
 ## Prompts extras (opcionais, use quando fizer sentido)
 
 ### Gerar uma versão de demonstração publicável

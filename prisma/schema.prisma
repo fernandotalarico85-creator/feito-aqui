@@ -25,6 +25,22 @@ enum StatusVerificacao {
   VERIFICADO
 }
 
+/**
+ * Documento de verificação de identidade do worker (Prompt 11) — três formatos
+ * aceitos: CNH sozinha, RG que já mostra o CPF, ou RG + CPF como 2 uploads.
+ */
+enum TipoDocumentoVerificacao {
+  CNH
+  RG_COM_CPF
+  RG_E_CPF_SEPARADOS
+}
+
+enum StatusDocumentoVerificacao {
+  PENDENTE
+  APROVADO
+  REJEITADO
+}
+
 enum StatusServiceRequest {
   TRIAGEM
   AGUARDANDO_ORCAMENTO
@@ -42,9 +58,11 @@ enum StatusBudget {
   EXPIRADO // não respondido pelo cliente dentro do prazo (ver ORCAMENTO_PRAZO_EXPIRACAO_DIAS)
 }
 
-/** Negociação de orçamento — cliente propõe outro valor/prazo, worker aceita ou
+/**
+ * Negociação de orçamento — cliente propõe outro valor/prazo, worker aceita ou
  * recusa. Recusar não mata o orçamento original: ele continua PENDENTE no valor
- * inicial, o cliente pode aceitar como estava ou tentar uma nova contra-proposta. */
+ * inicial, o cliente pode aceitar como estava ou tentar uma nova contra-proposta.
+ */
 enum StatusContraproposta {
   NENHUMA
   PENDENTE_WORKER
@@ -90,9 +108,11 @@ enum GravidadeStrike {
   GRAVISSIMA
 }
 
-/** Confirmação de entrega pelo cliente (Seção 3.8) — a parcela final do repasse só
+/**
+ * Confirmação de entrega pelo cliente (Seção 3.8) — a parcela final do repasse só
  * libera depois de CONFIRMADO (manual ou automático por prazo), nunca só por o worker
- * se autodeclarar concluído. */
+ * se autodeclarar concluído.
+ */
 enum StatusConclusao {
   AGUARDANDO_CONFIRMACAO_CLIENTE
   CONFIRMADO
@@ -104,12 +124,18 @@ enum StatusConclusao {
 // ---------------------------------------------------------------------------
 
 model User {
-  id        String      @id @default(cuid())
-  nome      String
-  email     String      @unique
-  senhaHash String
-  tipo      TipoUsuario
-  criadoEm  DateTime    @default(now())
+  id            String      @id @default(cuid())
+  // Identificador de cadastro (Prompt 11) — C00000001.../W00000001..., gerado em
+  // src/lib/numeracao.ts (gerarIdCadastro). Contador global, nunca reinicia.
+  idCadastro    String      @unique
+  nome          String
+  sobrenome     String
+  cpf           String      @unique
+  fotoPerfilUrl String?
+  email         String      @unique
+  senhaHash     String
+  tipo          TipoUsuario
+  criadoEm      DateTime    @default(now())
 
   clientProfile ClientProfile?
   workerProfile WorkerProfile?
@@ -118,12 +144,12 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  criadoEm  DateTime @default(now())
-  expiraEm  DateTime
+  id       String   @id @default(cuid())
+  token    String   @unique
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criadoEm DateTime @default(now())
+  expiraEm DateTime
 }
 
 // ---------------------------------------------------------------------------
@@ -131,9 +157,20 @@ model Session {
 // ---------------------------------------------------------------------------
 
 model ClientProfile {
-  id       String @id @default(cuid())
-  userId   String @unique
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Endereço de cadastro (Prompt 11) — diferente dos Address[] abaixo, que são
+  // endereços de OBRA salvos por pedido. Só endereço e foto de perfil (no User)
+  // podem ser editados depois do cadastro — ver 3.9.
+  enderecoLogradouro  String
+  enderecoNumero      String
+  enderecoComplemento String?
+  enderecoBairro      String
+  enderecoCidade      String
+  enderecoEstado      String // UF
+  enderecoCep         String
 
   enderecos            Address[]
   serviceRequests      ServiceRequest[]
@@ -142,9 +179,11 @@ model ClientProfile {
   cancelamentosTardios CancelamentoTardio[]
 }
 
-/** Log de cancelamentos tardios (pós-fechamento) feitos pelo cliente — janela móvel de
+/**
+ * Log de cancelamentos tardios (pós-fechamento) feitos pelo cliente — janela móvel de
  * 90 dias para detectar reincidência (Seção 3.6 / princípio de confiança de mão dupla).
- * Não é um contador simples porque precisa "esquecer" ocorrências fora da janela. */
+ * Não é um contador simples porque precisa "esquecer" ocorrências fora da janela.
+ */
 model CancelamentoTardio {
   id              String        @id @default(cuid())
   clientProfileId String
@@ -177,12 +216,30 @@ model WorkerProfile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  bio                  String
-  regiaoAtendimento    String
-  statusVerificacao    StatusVerificacao @default(PENDENTE)
-  elegivelParaTriagem  Boolean           @default(true)
-  destaquePago         Boolean           @default(false)
+  bio                   String
+  regiaoAtendimento     String
+  statusVerificacao     StatusVerificacao @default(PENDENTE)
+  elegivelParaTriagem   Boolean           @default(true)
+  destaquePago          Boolean           @default(false)
   destaquePagoValidoAte DateTime?
+
+  // Endereço de cadastro (Prompt 11) — só ele e a foto de perfil (no User) podem
+  // ser editados depois do cadastro, ver 3.9.
+  enderecoLogradouro  String
+  enderecoNumero      String
+  enderecoComplemento String?
+  enderecoBairro      String
+  enderecoCidade      String
+  enderecoEstado      String // UF
+  enderecoCep         String
+
+  // Documento de verificação de identidade (Prompt 11) — obrigatório no cadastro do
+  // worker. documentoUrl2 só é usado quando tipoDocumento = RG_E_CPF_SEPARADOS.
+  // Sem OCR/validação automática: admin aprova/rejeita manualmente em /admin/workers.
+  tipoDocumento   TipoDocumentoVerificacao
+  documentoUrl1   String
+  documentoUrl2   String?
+  documentoStatus StatusDocumentoVerificacao @default(PENDENTE)
 
   // Métricas usadas na fórmula de ranking (Seção 3.3) — recalculadas conforme
   // reviews/bookings acontecem, ver src/lib/ranking.ts
@@ -215,8 +272,10 @@ enum StatusRepasse {
   LIBERADO
 }
 
-/** Repasse do worker em 3 parcelas por Booking (regra pedida pelo usuário no meio do
- * Prompt 9) — substitui o modelo antigo de "comissão única na conclusão". */
+/**
+ * Repasse do worker em 3 parcelas por Booking (regra pedida pelo usuário no meio do
+ * Prompt 9) — substitui o modelo antigo de "comissão única na conclusão".
+ */
 model RepasseWorker {
   id        String  @id @default(cuid())
   bookingId String
@@ -266,13 +325,15 @@ model PortfolioItem {
   criadoEm      DateTime @default(now())
 }
 
-/** Foto(s) do "depois" enviada(s) pelo worker ao marcar conclusão no check-out
+/**
+ * Foto(s) do "depois" enviada(s) pelo worker ao marcar conclusão no check-out
  * (Seção 3.8) — obrigatório pelo menos 1 antes do status avançar para concluído.
- * Podem ser promovidas para o portfólio na hora ou depois, a partir do perfil. */
+ * Podem ser promovidas para o portfólio na hora ou depois, a partir do perfil.
+ */
 model ServicePhoto {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   bookingId String
-  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   url      String
   criadoEm DateTime @default(now())
@@ -316,12 +377,12 @@ model SubService {
 // ---------------------------------------------------------------------------
 
 model ServiceRequest {
-  id              String          @id @default(cuid())
+  id              String        @id @default(cuid())
   // Identificador legível (Prompt 11) — formato OS-AAMMDD-NNNNN, gerado em
   // src/lib/numeracao.ts. Facilita busca/referência em disputas e suporte.
-  numeroOS        String          @unique
+  numeroOS        String        @unique
   clientProfileId String
-  clientProfile   ClientProfile   @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
 
   categoryId String
   category   ServiceCategory @relation(fields: [categoryId], references: [id])
@@ -329,11 +390,11 @@ model ServiceRequest {
   addressId String
   address   Address @relation(fields: [addressId], references: [id])
 
-  descricaoLivre     String
-  subServicosJson     String // JSON: ids/nomes dos sub-serviços sugeridos, na ordem
-  janelaDataInicio    DateTime
-  janelaDataFim       DateTime
-  status              StatusServiceRequest @default(TRIAGEM)
+  descricaoLivre   String
+  subServicosJson  String // JSON: ids/nomes dos sub-serviços sugeridos, na ordem
+  janelaDataInicio DateTime
+  janelaDataFim    DateTime
+  status           StatusServiceRequest @default(TRIAGEM)
 
   budgets Budget[]
 
@@ -351,16 +412,16 @@ model Budget {
   workerId String
   worker   WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
-  valor           Float
-  prazoEntrega    DateTime // prazo definido pelo worker, não pela IA
-  status          StatusBudget @default(PENDENTE)
+  valor        Float
+  prazoEntrega DateTime // prazo definido pelo worker, não pela IA
+  status       StatusBudget @default(PENDENTE)
 
   // Contra-proposta do cliente (negociação de orçamento) — ver src/lib/fecharOrcamento.ts
-  contrapropostaStatus      StatusContraproposta @default(NENHUMA)
-  valorContraproposta       Float?
+  contrapropostaStatus       StatusContraproposta @default(NENHUMA)
+  valorContraproposta        Float?
   prazoEntregaContraproposta DateTime?
-  contrapropostaMensagem    String?
-  contrapropostaCriadaEm    DateTime?
+  contrapropostaMensagem     String?
+  contrapropostaCriadaEm     DateTime?
 
   booking Booking?
 
@@ -372,11 +433,11 @@ model Booking {
   budgetId String @unique
   budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
-  valorTotal          Float
-  comissaoValor        Float
-  comissaoPercentual   Float
-  pagamentoStatus      String        @default("simulado_aprovado")
-  status               StatusBooking @default(FECHADO)
+  valorTotal         Float
+  comissaoValor      Float
+  comissaoPercentual Float
+  pagamentoStatus    String        @default("simulado_aprovado")
+  status             StatusBooking @default(FECHADO)
 
   checkInHorario        DateTime?
   checkInLatitude       Float?
@@ -401,10 +462,10 @@ model Booking {
   // Confirmação de entrega (Seção 3.8) — marcar conclusão no check-out não libera a
   // parcela final do repasse sozinho; fica pendente até o cliente confirmar, contestar,
   // ou o prazo de confirmação automática se esgotar (ver src/lib/confirmacaoConclusao.ts).
-  statusConclusao         StatusConclusao?
-  conclusaoMarcadaEm      DateTime?
-  conclusaoConfirmadaEm   DateTime?
-  conclusaoAutoConfirmada Boolean          @default(false)
+  statusConclusao               StatusConclusao?
+  conclusaoMarcadaEm            DateTime?
+  conclusaoConfirmadaEm         DateTime?
+  conclusaoAutoConfirmada       Boolean          @default(false)
   contestacaoConclusaoTexto     String?
   contestacaoConclusaoDataEnvio DateTime?
 
@@ -485,7 +546,7 @@ model Strike {
 
   tipoInfracao      String
   gravidade         GravidadeStrike
-  dataOcorrencia    DateTime        @default(now())
+  dataOcorrencia    DateTime          @default(now())
   expiraEm          DateTime
   statusContestacao StatusContestacao @default(NENHUMA)
   observacao        String?
@@ -504,18 +565,18 @@ model Dispute {
 
   bookingId String?
   reviewId  String?
-  review    Review? @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  review    Review?        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   strikeId  String?
-  strike    Strike? @relation(fields: [strikeId], references: [id], onDelete: Cascade)
+  strike    Strike?        @relation(fields: [strikeId], references: [id], onDelete: Cascade)
   repasseId String?
   repasse   RepasseWorker? @relation(fields: [repasseId], references: [id], onDelete: Cascade)
 
   evidenciasJson String? // JSON: texto/fotos/mensagens
 
-  decisao         String?
-  decididoPorId   String?
-  decididoPor     User?     @relation("DecisoesAdmin", fields: [decididoPorId], references: [id])
-  dataDecisao     DateTime?
+  decisao       String?
+  decididoPorId String?
+  decididoPor   User?     @relation("DecisoesAdmin", fields: [decididoPorId], references: [id])
+  dataDecisao   DateTime?
 
   criadoEm DateTime @default(now())
 }
@@ -524,9 +585,11 @@ model Dispute {
 // Numeração de documentos (Prompt 11) — OS (pedido) e PO (orçamento)
 // ---------------------------------------------------------------------------
 
-/** Contador atômico por tipo de documento + dia (reinicia a cada dia) — usado por
+/**
+ * Contador atômico por tipo de documento + dia (reinicia a cada dia) — usado por
  * src/lib/numeracao.ts pra gerar OS-AAMMDD-NNNNN e PO-AAMMDD-NNNNN. O upsert nessa
- * tabela é atômico no Postgres, então é seguro mesmo com criações simultâneas. */
+ * tabela é atômico no Postgres, então é seguro mesmo com criações simultâneas.
+ */
 model SequenciaDiaria {
   id       String @id @default(cuid())
   tipo     String // "OS" ou "PO"
@@ -534,4 +597,16 @@ model SequenciaDiaria {
   contador Int    @default(0)
 
   @@unique([tipo, data])
+}
+
+/**
+ * Contador global (nunca reinicia) pro ID de cadastro C/W do Prompt 11 — diferente
+ * de SequenciaDiaria, que reinicia por dia. Usado por gerarIdCadastro.
+ */
+model SequenciaCadastro {
+  id       String @id @default(cuid())
+  tipo     String // "C" ou "W"
+  contador Int    @default(0)
+
+  @@unique([tipo])
 }

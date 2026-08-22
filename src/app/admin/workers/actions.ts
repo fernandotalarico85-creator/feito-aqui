@@ -21,3 +21,23 @@ export async function alternarVerificacaoAction(formData: FormData) {
   revalidatePath("/admin/workers");
   revalidatePath("/admin");
 }
+
+/**
+ * Decisão do admin sobre o documento de verificação de identidade enviado no
+ * cadastro (Prompt 11) — sem OCR/validação automática, é uma revisão manual.
+ */
+export async function decidirDocumentoAction(formData: FormData) {
+  await exigirUsuario("ADMIN");
+  const workerProfileId = String(formData.get("workerProfileId") ?? "");
+  const decisao = String(formData.get("decisao") ?? "");
+
+  if (decisao !== "APROVADO" && decisao !== "REJEITADO") return;
+
+  await prisma.workerProfile.update({
+    where: { id: workerProfileId },
+    data: { documentoStatus: decisao as "APROVADO" | "REJEITADO" },
+  });
+
+  revalidatePath("/admin/workers");
+  revalidatePath("/admin");
+}

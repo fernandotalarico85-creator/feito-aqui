@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/db";
-import { gerarNumeroDocumento } from "../src/lib/numeracao";
+import { gerarNumeroDocumento, gerarIdCadastro } from "../src/lib/numeracao";
 
 const SENHA_PADRAO = "senha123";
 
@@ -12,6 +12,7 @@ async function main() {
   console.log("Seed: limpando dados existentes...");
   // Ordem respeita as dependências de chave estrangeira.
   await prisma.sequenciaDiaria.deleteMany();
+  await prisma.sequenciaCadastro.deleteMany();
   await prisma.dispute.deleteMany();
   await prisma.strike.deleteMany();
   await prisma.walletTransaction.deleteMany();
@@ -54,9 +55,15 @@ async function main() {
   // -------------------------------------------------------------------------
   // Admin
   // -------------------------------------------------------------------------
+  // Admin não tem fluxo de cadastro público (Prompt 11 só cobre cliente/worker),
+  // então idCadastro/cpf abaixo são valores fixos de placeholder, não gerados
+  // pelo contador C/W.
   await prisma.user.create({
     data: {
+      idCadastro: "ADMIN0001",
       nome: "Admin Feito Aqui",
+      sobrenome: "Feito Aqui",
+      cpf: "00000000000",
       email: "admin@feitoaqui.com",
       senhaHash,
       tipo: "ADMIN",
@@ -68,12 +75,21 @@ async function main() {
   // -------------------------------------------------------------------------
   const cliente1 = await prisma.user.create({
     data: {
+      idCadastro: await gerarIdCadastro("C"),
       nome: "Fernanda Souza",
+      sobrenome: "Souza",
+      cpf: "11122233344",
       email: "cliente1@feitoaqui.com",
       senhaHash,
       tipo: "CLIENTE",
       clientProfile: {
         create: {
+          enderecoLogradouro: "Rua das Flores",
+          enderecoNumero: "120",
+          enderecoBairro: "Jardim Paulista",
+          enderecoCidade: "São Paulo",
+          enderecoEstado: "SP",
+          enderecoCep: "01415-000",
           enderecos: {
             create: {
               rotulo: "Casa",
@@ -95,12 +111,21 @@ async function main() {
 
   const cliente2 = await prisma.user.create({
     data: {
+      idCadastro: await gerarIdCadastro("C"),
       nome: "Carlos Menezes",
+      sobrenome: "Menezes",
+      cpf: "22233344455",
       email: "cliente2@feitoaqui.com",
       senhaHash,
       tipo: "CLIENTE",
       clientProfile: {
         create: {
+          enderecoLogradouro: "Av. Rebouças",
+          enderecoNumero: "980",
+          enderecoBairro: "Pinheiros",
+          enderecoCidade: "São Paulo",
+          enderecoEstado: "SP",
+          enderecoCep: "05402-100",
           enderecos: {
             create: {
               rotulo: "Apartamento",
@@ -128,6 +153,8 @@ async function main() {
   const workersData = [
     {
       nome: "Roberto Alves",
+      sobrenome: "Alves",
+      cpf: "33344455566",
       email: "worker1@feitoaqui.com",
       bio: "20 anos de experiência em reformas de banheiro e hidráulica.",
       regiaoAtendimento: "São Paulo - Zona Sul",
@@ -139,9 +166,19 @@ async function main() {
       volumeConcluidos: 40,
       destaquePago: false,
       comPortfolio: true,
+      enderecoLogradouro: "Rua Vergueiro",
+      enderecoNumero: "500",
+      enderecoBairro: "Vila Mariana",
+      enderecoCidade: "São Paulo",
+      enderecoEstado: "SP",
+      enderecoCep: "04101-000",
+      tipoDocumento: "CNH" as const,
+      documentoStatus: "APROVADO" as const,
     },
     {
       nome: "Marcos Lima",
+      sobrenome: "Lima",
+      cpf: "44455566677",
       email: "worker2@feitoaqui.com",
       bio: "Especialista em revestimentos e acabamento fino.",
       regiaoAtendimento: "São Paulo - Zona Oeste",
@@ -153,9 +190,19 @@ async function main() {
       volumeConcluidos: 25,
       destaquePago: true, // nota >= 4.0, elegível para destaque (Seção 3.1)
       comPortfolio: true,
+      enderecoLogradouro: "Rua Teodoro Sampaio",
+      enderecoNumero: "800",
+      enderecoBairro: "Pinheiros",
+      enderecoCidade: "São Paulo",
+      enderecoEstado: "SP",
+      enderecoCep: "05406-000",
+      tipoDocumento: "RG_COM_CPF" as const,
+      documentoStatus: "APROVADO" as const,
     },
     {
       nome: "Juliana Freitas",
+      sobrenome: "Freitas",
+      cpf: "55566677788",
       email: "worker3@feitoaqui.com",
       bio: "Marcenaria e pintura, atendimento pontual e organizado.",
       regiaoAtendimento: "São Paulo - Centro",
@@ -167,9 +214,19 @@ async function main() {
       volumeConcluidos: 12,
       destaquePago: false,
       comPortfolio: true,
+      enderecoLogradouro: "Rua Augusta",
+      enderecoNumero: "1200",
+      enderecoBairro: "Consolação",
+      enderecoCidade: "São Paulo",
+      enderecoEstado: "SP",
+      enderecoCep: "01304-001",
+      tipoDocumento: "CNH" as const,
+      documentoStatus: "APROVADO" as const,
     },
     {
       nome: "Paulo Ricardo",
+      sobrenome: "Ricardo",
+      cpf: "66677788899",
       email: "worker4@feitoaqui.com",
       bio: "Elétrica residencial e predial.",
       regiaoAtendimento: "São Paulo - Zona Norte",
@@ -181,9 +238,19 @@ async function main() {
       volumeConcluidos: 55,
       destaquePago: false,
       comPortfolio: true,
+      enderecoLogradouro: "Rua Voluntários da Pátria",
+      enderecoNumero: "300",
+      enderecoBairro: "Santana",
+      enderecoCidade: "São Paulo",
+      enderecoEstado: "SP",
+      enderecoCep: "02010-000",
+      tipoDocumento: "RG_E_CPF_SEPARADOS" as const, // exercita o 2º upload (documentoUrl2)
+      documentoStatus: "PENDENTE" as const, // ainda em análise, junto com a verificação
     },
     {
       nome: "Bianca Nogueira",
+      sobrenome: "Nogueira",
+      cpf: "77788899900",
       email: "worker5@feitoaqui.com",
       bio: "Recém-chegada à plataforma, especialista em impermeabilização.",
       regiaoAtendimento: "São Paulo - Zona Sul",
@@ -195,6 +262,14 @@ async function main() {
       volumeConcluidos: 0,
       destaquePago: false,
       comPortfolio: false, // cold start — sem histórico (Seção 3.3)
+      enderecoLogradouro: "Rua Cardeal Arcoverde",
+      enderecoNumero: "400",
+      enderecoBairro: "Pinheiros",
+      enderecoCidade: "São Paulo",
+      enderecoEstado: "SP",
+      enderecoCep: "05407-000",
+      tipoDocumento: "CNH" as const,
+      documentoStatus: "APROVADO" as const,
     },
   ];
 
@@ -206,7 +281,10 @@ async function main() {
   for (const w of workersData) {
     const user = await prisma.user.create({
       data: {
+        idCadastro: await gerarIdCadastro("W"),
         nome: w.nome,
+        sobrenome: w.sobrenome,
+        cpf: w.cpf,
         email: w.email,
         senhaHash,
         tipo: "WORKER",
@@ -224,6 +302,17 @@ async function main() {
             destaquePagoValidoAte: w.destaquePago
               ? new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000)
               : null,
+            enderecoLogradouro: w.enderecoLogradouro,
+            enderecoNumero: w.enderecoNumero,
+            enderecoBairro: w.enderecoBairro,
+            enderecoCidade: w.enderecoCidade,
+            enderecoEstado: w.enderecoEstado,
+            enderecoCep: w.enderecoCep,
+            tipoDocumento: w.tipoDocumento,
+            documentoUrl1: "/mock/portfolio/antes-1.svg",
+            documentoUrl2:
+              w.tipoDocumento === "RG_E_CPF_SEPARADOS" ? "/mock/portfolio/depois-1.svg" : null,
+            documentoStatus: w.documentoStatus,
             categorias: { connect: [{ id: categoriaBanheiro.id }] },
             agenda: {
               create: Array.from({ length: 14 }).map((_, i) => ({
