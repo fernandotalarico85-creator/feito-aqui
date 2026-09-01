@@ -208,6 +208,40 @@ Itens marcados "placeholder por enquanto" devem existir como link funcional (sem
 uma tela simples de "Em construção" — a funcionalidade real desses itens é escopo de prompts
 futuros, não deste ajuste de menu.
 
+### 3.11 Menu do worker e do cliente completos (Prompts 17 e 18)
+Expandindo 3.9: TODOS os itens de navegação de cliente e worker (não só "Meu Perfil"/
+"Portfólio"/"Sair") ficam dentro do dropdown do nome, como lista única (sem grupos — isso é
+só do admin, Seção 3.10):
+- **Worker**: Pedidos Recebidos, Meus Orçamentos, Strikes, Agenda, Meus Ganhos, Destaque,
+  Portfólio, Meu Perfil, Sair — nessa ordem. A barra horizontal fica só com o nome/dropdown.
+- **Cliente**: Meus Pedidos, Minha Carteira, Perfil, Sair — nessa ordem. "+ Novo Pedido"
+  continua fora do dropdown, na barra horizontal — é uma ação/CTA principal, não item de
+  navegação.
+- Nenhuma rota muda: é só reorganização de navegação/UI.
+
+### 3.12 "Meu Perfil" como cartão de contato (Prompt 19)
+Redesenho visual de "Meu Perfil" (cliente e worker) — as regras de quem pode editar o quê
+(Seção 3.9: Nome/Sobrenome/E-mail/Endereço/Foto editáveis; CPF e ID de cadastro travados) não
+mudam, só a organização visual e como a edição é acionada. Layout em 2 colunas
+(`src/components/PerfilCard.tsx`, reaproveitado por cliente e worker):
+- **Cartão de identidade** (coluna esquerda, fixo): avatar, nome completo, etiqueta de papel
+  ("Cliente"/"Worker"), tags de categoria (só worker), ID de cadastro com ícone de cadeado,
+  botão "Enviar mensagem" (decorativo, sem funcionalidade — chat é escopo futuro), navegação
+  vertical com "Informações" (ativo) e "Minha Carteira" (linka para a carteira/ganhos que já
+  existe — `/cliente/carteira` ou `/worker/ganhos` — só o rótulo do item do menu muda).
+- **Painel "Informações"** (coluna direita): Identificação (ID + CPF, sempre com cadeado),
+  Dados pessoais (Nome/Sobrenome/E-mail), Endereço, Foto de perfil, e — só worker — status do
+  Documento de verificação. Estado padrão é somente leitura (texto estático, sem botão
+  "Salvar" visível).
+- **Menu "⋮"** no cartão de identidade, com exatamente duas opções: "Editar" (alterna o
+  painel para modo de edição — CPF/ID continuam travados mesmo editando — com botões
+  "Cancelar"/"Salvar alterações") e "Excluir conta" (abre confirmação; como essa
+  funcionalidade não existe no protótipo, a confirmação termina num aviso de que exclusão de
+  conta ainda não está disponível, sem apagar nada de verdade).
+- A seção "Dados do perfil" do worker (bio, região de atendimento, categorias atendidas) não
+  fazia parte do escopo deste redesenho — continua como uma seção própria, abaixo do cartão,
+  com seu próprio formulário sempre editável (inalterada).
+
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
 - Split de pagamento real / gateway de pagamento — simular com um status de pagamento mockado.

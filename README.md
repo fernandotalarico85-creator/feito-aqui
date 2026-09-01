@@ -114,17 +114,26 @@ Implementado de verdade, com efeito real no banco de dados:
   cadastro (CNH, RG com CPF, ou RG + CPF separados), com `documentoStatus` que o admin
   aprova/rejeita manualmente em `/admin/workers` — sem OCR, revisão separada da verificação
   geral do worker (Seção 3.7).
-- **Menu do worker com 3 itens** (Seção 3.9): "Meu Perfil" (cadastro/endereço/foto) e
-  "Portfólio" (galeria de fotos antes/depois, em `/worker/portfolio`) são telas e rotas
-  separadas — não compartilham formulário — dentro do dropdown do nome do usuário, junto
-  com "Sair". O item "Portfólio" só aparece pra worker.
-- **Dropdown do usuário em cliente/worker/admin** (Seções 3.9 e 3.10): mesmo componente
-  reaproveitado (`src/components/UserMenuDropdown.tsx`) nas três áreas — nenhum link de
-  navegação solto na barra horizontal, tudo dentro do dropdown do nome logado. Cliente tem
-  "Meu Perfil" + "Sair"; worker tem "Meu Perfil" + "Portfólio" + "Sair"; admin tem os grupos
-  expansíveis "Clientes" e "Workers" (cada um com seus subitens — Aprovar Perfil, Strikes,
+- **"Meu Perfil" e "Portfólio" são telas separadas** (Seção 3.9): "Meu Perfil" (cadastro/
+  endereço/foto) e "Portfólio" (galeria de fotos antes/depois, em `/worker/portfolio`) são
+  telas e rotas próprias, sem compartilhar formulário. O item "Portfólio" só aparece pra
+  worker.
+- **Dropdown do usuário em cliente/worker/admin, com TODA a navegação dentro dele** (Seções
+  3.9, 3.10 e 3.11): mesmo componente reaproveitado (`src/components/UserMenuDropdown.tsx`)
+  nas três áreas — nenhum link de navegação solto na barra horizontal (cliente mantém só o
+  CTA "+ Novo pedido" fora do dropdown). Cliente: Meus Pedidos, Minha Carteira, Perfil, Sair.
+  Worker: Pedidos Recebidos, Meus Orçamentos, Strikes, Agenda, Meus Ganhos, Destaque,
+  Portfólio, Meu Perfil, Sair. Admin tem os grupos expansíveis "Clientes" e "Workers" (cada
+  um com seus subitens — Aprovar Perfil, Strikes,
   Repasses e Disputas apontam para páginas reais; Perfil de cliente/worker e Portfólio de
   worker no admin ainda são placeholders "em construção") + "Sair" solto.
+- **"Meu Perfil" como cartão de contato** (Seção 3.11): layout em 2 colunas
+  (`src/components/PerfilCard.tsx`, reaproveitado por cliente e worker) — cartão de
+  identidade fixo à esquerda (avatar, nome, papel, categorias — só worker —, ID de cadastro,
+  navegação "Informações"/"Minha Carteira") e painel "Informações" à direita, que abre em
+  somente leitura e só vira formulário editável pelo menu "⋮ > Editar" (CPF e ID de cadastro
+  continuam travados mesmo editando). "⋮ > Excluir conta" abre uma confirmação, mas não
+  apaga nada de verdade — funcionalidade fora de escopo da v0.1.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 
@@ -180,6 +189,10 @@ A tabela de infrações (tipo → gravidade → ação sugerida, Seção 3.6) fi
   já foi resolvida antes de uma nova poder ser enviada).
 - Sem multi-idioma, notificações push ou app nativo — web responsivo apenas, como previsto no
   escopo da v0.1.
+- **"Excluir conta" é só um placeholder**: o menu "⋮" em "Meu Perfil" tem a opção, mas
+  confirmar só mostra um aviso — nenhuma conta é apagada de verdade.
+- **"Enviar mensagem" é decorativo**: botão desabilitado no cartão de "Meu Perfil" — não há
+  chat entre cliente e worker no protótipo.
 
 Checagem mais recente: `npm run build` (produção), `tsc --noEmit` e `eslint` passam limpos, e
 os fluxos de negociação de orçamento (aceitar/recusar/contra-proposta/expiração) e confirmação
