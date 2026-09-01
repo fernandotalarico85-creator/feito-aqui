@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import EnderecoCadastroFields from "@/components/EnderecoCadastroFields";
+import { manropePerfil, interPerfil } from "@/lib/fontsPerfil";
 
 const ICONE_CADEADO = (
   <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
@@ -16,12 +17,16 @@ const ICONE_CADEADO = (
 );
 
 /**
- * Cartão de identidade + painel "Informações" da tela "Meu Perfil" (Prompt 19) — usado
- * por cliente e worker. Layout em 2 colunas: cartão fixo à esquerda (avatar, nome,
- * papel, ID de cadastro, "Enviar mensagem" desabilitado, navegação vertical) e o
+ * Cartão de identidade + painel "Informações" da tela "Meu Perfil" (Prompts 19 e 20) —
+ * usado por cliente e worker. Layout em 2 colunas: cartão fixo à esquerda (avatar,
+ * nome, papel, ID de cadastro, "Enviar mensagem" desabilitado, navegação vertical) e o
  * painel "Informações" à direita, que abre em modo leitura e só vira formulário
  * editável via "Editar" no menu "⋮" — nome/sobrenome/e-mail/endereço/foto continuam
  * editáveis (Seção 3.9), CPF e ID de cadastro continuam travados mesmo em edição.
+ *
+ * Identidade visual própria (Prompt 20, Seção 3.11) — exceção pontual só para esta
+ * tela, via as fontes de src/lib/fontsPerfil.ts e as cores hexadecimais abaixo; o resto
+ * do app continua com o estilo padrão (stone/Geist).
  */
 export default function PerfilCard({
   tipo,
@@ -82,23 +87,29 @@ export default function PerfilCard({
   } · ${endereco.bairro}, ${endereco.cidade}/${endereco.estado} · CEP ${endereco.cep}`;
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
+    <div className={`${interPerfil.className} grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]`}>
       {/* Cartão de identidade */}
-      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5">
-        <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-full bg-stone-100">
+      <aside className="h-fit rounded-2xl border border-[#E7EEF0] bg-white p-5 shadow-md">
+        <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-full bg-gradient-to-br from-[#1F4E5F] to-[#3F7C8A]">
           {fotoPerfilUrl ? (
             <Image src={fotoPerfilUrl} alt="Foto de perfil" fill unoptimized className="object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-stone-400">
+            <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-white">
               {nome.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
 
-        <p className="mt-3 text-center text-base font-semibold text-stone-900">{nomeCompleto}</p>
+        <p className={`${manropePerfil.className} mt-3 text-center text-base font-extrabold text-[#243138]`}>
+          {nomeCompleto}
+        </p>
 
         <div className="mt-2 flex justify-center">
-          <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700">
+          <span
+            className={`${manropePerfil.className} rounded-full px-2.5 py-0.5 text-xs font-bold text-white ${
+              tipo === "CLIENTE" ? "bg-[#1F4E5F]" : "bg-[#C0592C]"
+            }`}
+          >
             {tipo === "CLIENTE" ? "Cliente" : "Worker"}
           </span>
         </div>
@@ -108,7 +119,7 @@ export default function PerfilCard({
             {categorias.map((c) => (
               <span
                 key={c}
-                className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700"
+                className="rounded-full bg-[#3F7C8A] px-2 py-0.5 text-xs font-medium text-white"
               >
                 {c}
               </span>
@@ -116,7 +127,7 @@ export default function PerfilCard({
           </div>
         )}
 
-        <p className="mt-3 flex items-center justify-center gap-1 font-mono text-xs text-stone-500">
+        <p className="mt-3 flex items-center justify-center gap-1 rounded-full bg-[#E7EEF0] px-2.5 py-1 font-mono text-xs text-[#667680]">
           {ICONE_CADEADO}
           {idCadastro}
         </p>
@@ -125,41 +136,43 @@ export default function PerfilCard({
           type="button"
           disabled
           title="Em breve"
-          className="mt-4 w-full cursor-not-allowed rounded-md border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-400"
+          className="mt-4 w-full cursor-not-allowed rounded-xl bg-[#E7EEF0] px-3 py-1.5 text-sm font-medium text-[#667680]"
         >
           Enviar mensagem
         </button>
 
-        <nav className="mt-5 flex flex-col gap-1 border-t border-stone-100 pt-4 text-sm">
-          <span className="rounded-md bg-stone-100 px-3 py-1.5 font-medium text-stone-900">
+        <nav className="mt-5 flex flex-col gap-1 border-t border-[#E7EEF0] pt-4 text-sm">
+          <span
+            className={`${manropePerfil.className} rounded-lg bg-[#3F7C8A]/10 px-3 py-1.5 font-bold text-[#3F7C8A]`}
+          >
             Informações
           </span>
           <Link
             href={minhaCarteiraHref}
-            className="rounded-md px-3 py-1.5 text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+            className="rounded-lg px-3 py-1.5 text-[#667680] hover:bg-[#E7EEF0] hover:text-[#243138]"
           >
             Minha Carteira
           </Link>
         </nav>
 
-        <div className="relative mt-4 border-t border-stone-100 pt-3" ref={menuRef}>
+        <div className="relative mt-4 border-t border-[#E7EEF0] pt-3" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuAberto((v) => !v)}
-            className="w-full rounded-md px-3 py-1.5 text-center text-lg leading-none text-stone-500 hover:bg-stone-50"
+            className="w-full rounded-lg px-3 py-1.5 text-center text-lg leading-none text-[#667680] hover:bg-[#E7EEF0]"
             aria-label="Mais opções"
           >
             ⋮
           </button>
           {menuAberto && (
-            <div className="absolute inset-x-0 bottom-full z-10 mb-1 rounded-md border border-stone-200 bg-white py-1 shadow-lg">
+            <div className="absolute inset-x-0 bottom-full z-10 mb-1 rounded-xl border border-[#E7EEF0] bg-white py-1 shadow-lg">
               <button
                 type="button"
                 onClick={() => {
                   setEditando(true);
                   setMenuAberto(false);
                 }}
-                className="block w-full px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50"
+                className="block w-full px-3 py-2 text-left text-sm text-[#243138] hover:bg-[#E7EEF0]"
               >
                 Editar
               </button>
@@ -179,49 +192,59 @@ export default function PerfilCard({
       </aside>
 
       {/* Painel "Informações" */}
-      <section className="rounded-lg border border-stone-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-stone-900">Informações</h2>
+      <section className="rounded-2xl border border-[#E7EEF0] bg-white p-5 shadow-md">
+        <h2 className={`${manropePerfil.className} text-base font-extrabold text-[#1F4E5F]`}>
+          Informações
+        </h2>
 
         {!editando ? (
           <div className="mt-4 flex flex-col gap-5 text-sm">
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h3
+                className={`${manropePerfil.className} text-xs font-bold uppercase tracking-wide text-[#667680]`}
+              >
                 Identificação
               </h3>
               <dl className="mt-2 grid grid-cols-2 gap-y-2">
-                <dt className="flex items-center gap-1 text-stone-500">
+                <dt className="flex items-center gap-1 text-[#667680]">
                   {ICONE_CADEADO} ID de cadastro
                 </dt>
-                <dd className="text-right font-mono text-stone-900">{idCadastro}</dd>
-                <dt className="flex items-center gap-1 text-stone-500">{ICONE_CADEADO} CPF</dt>
-                <dd className="text-right text-stone-900">{cpf}</dd>
+                <dd className="text-right font-mono text-[#243138]">{idCadastro}</dd>
+                <dt className="flex items-center gap-1 text-[#667680]">{ICONE_CADEADO} CPF</dt>
+                <dd className="text-right text-[#243138]">{cpf}</dd>
               </dl>
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h3
+                className={`${manropePerfil.className} text-xs font-bold uppercase tracking-wide text-[#667680]`}
+              >
                 Dados pessoais
               </h3>
               <dl className="mt-2 grid grid-cols-2 gap-y-2">
-                <dt className="text-stone-500">Nome</dt>
-                <dd className="text-right text-stone-900">{nome}</dd>
-                <dt className="text-stone-500">Sobrenome</dt>
-                <dd className="text-right text-stone-900">{sobrenome}</dd>
-                <dt className="text-stone-500">E-mail</dt>
-                <dd className="text-right text-stone-900">{email}</dd>
+                <dt className="text-[#667680]">Nome</dt>
+                <dd className="text-right text-[#243138]">{nome}</dd>
+                <dt className="text-[#667680]">Sobrenome</dt>
+                <dd className="text-right text-[#243138]">{sobrenome}</dd>
+                <dt className="text-[#667680]">E-mail</dt>
+                <dd className="text-right text-[#243138]">{email}</dd>
               </dl>
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h3
+                className={`${manropePerfil.className} text-xs font-bold uppercase tracking-wide text-[#667680]`}
+              >
                 Endereço
               </h3>
-              <p className="mt-2 text-stone-900">{enderecoFormatado}</p>
+              <p className="mt-2 text-[#243138]">{enderecoFormatado}</p>
             </div>
 
             {tipo === "WORKER" && documentoStatusLabel && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                <h3
+                  className={`${manropePerfil.className} text-xs font-bold uppercase tracking-wide text-[#667680]`}
+                >
                   Documento de verificação
                 </h3>
                 <span
@@ -235,22 +258,24 @@ export default function PerfilCard({
         ) : (
           <form action={updateAction} className="mt-4 flex flex-col gap-4">
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h3
+                className={`${manropePerfil.className} text-xs font-bold uppercase tracking-wide text-[#667680]`}
+              >
                 Identificação
               </h3>
               <dl className="mt-2 grid grid-cols-2 gap-y-2 text-sm">
-                <dt className="flex items-center gap-1 text-stone-500">
+                <dt className="flex items-center gap-1 text-[#667680]">
                   {ICONE_CADEADO} ID de cadastro
                 </dt>
-                <dd className="text-right font-mono text-stone-900">{idCadastro}</dd>
-                <dt className="flex items-center gap-1 text-stone-500">{ICONE_CADEADO} CPF</dt>
-                <dd className="text-right text-stone-900">{cpf}</dd>
+                <dd className="text-right font-mono text-[#243138]">{idCadastro}</dd>
+                <dt className="flex items-center gap-1 text-[#667680]">{ICONE_CADEADO} CPF</dt>
+                <dd className="text-right text-[#243138]">{cpf}</dd>
               </dl>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-stone-700" htmlFor="nome">
+                <label className="block text-sm font-medium text-[#243138]" htmlFor="nome">
                   Nome
                 </label>
                 <input
@@ -258,11 +283,11 @@ export default function PerfilCard({
                   name="nome"
                   defaultValue={nome}
                   required
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-lg border border-[#d7e0e2] px-3 py-2 text-sm focus:border-[#3F7C8A] focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700" htmlFor="sobrenome">
+                <label className="block text-sm font-medium text-[#243138]" htmlFor="sobrenome">
                   Sobrenome
                 </label>
                 <input
@@ -270,12 +295,12 @@ export default function PerfilCard({
                   name="sobrenome"
                   defaultValue={sobrenome}
                   required
-                  className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-lg border border-[#d7e0e2] px-3 py-2 text-sm focus:border-[#3F7C8A] focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-stone-700" htmlFor="email">
+              <label className="block text-sm font-medium text-[#243138]" htmlFor="email">
                 E-mail
               </label>
               <input
@@ -284,7 +309,7 @@ export default function PerfilCard({
                 type="email"
                 defaultValue={email}
                 required
-                className="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-lg border border-[#d7e0e2] px-3 py-2 text-sm focus:border-[#3F7C8A] focus:outline-none"
               />
             </div>
 
@@ -300,7 +325,7 @@ export default function PerfilCard({
               }}
             />
             <div>
-              <label className="block text-xs font-medium text-stone-600" htmlFor="fotoPerfil">
+              <label className="block text-xs font-medium text-[#667680]" htmlFor="fotoPerfil">
                 Trocar foto de perfil (opcional)
               </label>
               <input
@@ -315,14 +340,14 @@ export default function PerfilCard({
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                className={`${manropePerfil.className} rounded-xl bg-[#1F4E5F] px-4 py-2 text-sm font-bold text-white hover:opacity-90`}
               >
                 Salvar alterações
               </button>
               <button
                 type="button"
                 onClick={() => setEditando(false)}
-                className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                className="rounded-xl border border-[#d7e0e2] px-4 py-2 text-sm font-medium text-[#667680] hover:bg-[#E7EEF0]"
               >
                 Cancelar
               </button>
@@ -333,25 +358,27 @@ export default function PerfilCard({
 
       {confirmandoExclusao && (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-5">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
             {!exclusaoAvisada ? (
               <>
-                <h3 className="text-sm font-semibold text-stone-900">Excluir conta</h3>
-                <p className="mt-2 text-sm text-stone-600">
+                <h3 className={`${manropePerfil.className} text-sm font-bold text-[#243138]`}>
+                  Excluir conta
+                </h3>
+                <p className="mt-2 text-sm text-[#667680]">
                   Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.
                 </p>
                 <div className="mt-4 flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setConfirmandoExclusao(false)}
-                    className="rounded-md border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                    className="rounded-xl border border-[#d7e0e2] px-3 py-1.5 text-sm font-medium text-[#667680] hover:bg-[#E7EEF0]"
                   >
                     Cancelar
                   </button>
                   <button
                     type="button"
                     onClick={() => setExclusaoAvisada(true)}
-                    className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700"
+                    className="rounded-xl bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700"
                   >
                     Excluir conta
                   </button>
@@ -359,7 +386,7 @@ export default function PerfilCard({
               </>
             ) : (
               <>
-                <p className="text-sm text-stone-600">
+                <p className="text-sm text-[#667680]">
                   Exclusão de conta ainda não está disponível neste protótipo.
                 </p>
                 <div className="mt-4 flex justify-end">
@@ -369,7 +396,7 @@ export default function PerfilCard({
                       setConfirmandoExclusao(false);
                       setExclusaoAvisada(false);
                     }}
-                    className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+                    className={`${manropePerfil.className} rounded-xl bg-[#1F4E5F] px-3 py-1.5 text-sm font-bold text-white hover:opacity-90`}
                   >
                     Entendi
                   </button>

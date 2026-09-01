@@ -127,13 +127,16 @@ Implementado de verdade, com efeito real no banco de dados:
   um com seus subitens — Aprovar Perfil, Strikes,
   Repasses e Disputas apontam para páginas reais; Perfil de cliente/worker e Portfólio de
   worker no admin ainda são placeholders "em construção") + "Sair" solto.
-- **"Meu Perfil" como cartão de contato** (Seção 3.11): layout em 2 colunas
+- **"Meu Perfil" como cartão de contato** (Seção 3.12): layout em 2 colunas
   (`src/components/PerfilCard.tsx`, reaproveitado por cliente e worker) — cartão de
   identidade fixo à esquerda (avatar, nome, papel, categorias — só worker —, ID de cadastro,
   navegação "Informações"/"Minha Carteira") e painel "Informações" à direita, que abre em
   somente leitura e só vira formulário editável pelo menu "⋮ > Editar" (CPF e ID de cadastro
   continuam travados mesmo editando). "⋮ > Excluir conta" abre uma confirmação, mas não
   apaga nada de verdade — funcionalidade fora de escopo da v0.1.
+- **Identidade visual exclusiva de "Meu Perfil"** (Seção 3.13, `src/lib/fontsPerfil.ts`):
+  só essa tela usa a paleta `#1F4E5F`/`#3F7C8A`/`#C0592C`/`#E7EEF0` e as fontes Manrope/Inter
+  — exceção pontual, o resto do protótipo continua no estilo padrão (stone/Geist).
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

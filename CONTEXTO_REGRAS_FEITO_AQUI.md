@@ -242,6 +242,24 @@ mudam, só a organização visual e como a edição é acionada. Layout em 2 col
   fazia parte do escopo deste redesenho — continua como uma seção própria, abaixo do cartão,
   com seu próprio formulário sempre editável (inalterada).
 
+### 3.13 Identidade visual exclusiva de "Meu Perfil" (Prompt 20) `[exceção pontual]`
+Só a tela "Meu Perfil" (cliente e worker) usa uma paleta/tipografia própria — todo o resto do
+protótipo (barra superior, outras páginas dos dropdowns, admin) continua com o estilo padrão
+(stone/Geist). Definida em `src/lib/fontsPerfil.ts` (fontes) e aplicada diretamente via classes
+Tailwind arbitrárias em `src/components/PerfilCard.tsx` e nas páginas
+`/cliente/perfil`/`/worker/perfil` (incluindo a seção "Dados do perfil" do worker, pra não
+ficar visualmente inconsistente com o resto da tela):
+- Cores: `#1F4E5F` (primária — títulos, botão "Salvar alterações", pill "Cliente"), `#3F7C8A`
+  (secundária — tags de categoria do worker, item ativo "Informações" no menu vertical),
+  `#C0592C` (pill "Worker"), `#E7EEF0` (fundo suave de badges/botão "Enviar mensagem"),
+  `#243138` (texto principal), `#667680` (texto secundário/labels de seção em maiúsculas).
+- Tipografia: Manrope (700–800) via Google Fonts em títulos, labels de seção e nome do
+  usuário; Inter no texto corrido e nos valores dos campos.
+- Cards com cantos arredondados (~16px) e sombra suave; avatar com gradiente
+  primária→secundária quando não há foto; badges de ID/CPF com ícone de cadeado.
+- Confirmado por teste manual (clique real, não só programático) que o menu "⋮ > Editar"
+  funciona ponta a ponta nas duas telas depois da mudança visual.
+
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
 - Split de pagamento real / gateway de pagamento — simular com um status de pagamento mockado.
