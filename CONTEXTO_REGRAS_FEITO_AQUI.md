@@ -233,7 +233,7 @@ mudam, só a organização visual e como a edição é acionada. Layout em 2 col
   Dados pessoais (Nome/Sobrenome/E-mail), Endereço, Foto de perfil, e — só worker — status do
   Documento de verificação. Estado padrão é somente leitura (texto estático, sem botão
   "Salvar" visível).
-- **Menu "⋮"** no cartão de identidade, com exatamente duas opções: "Editar" (alterna o
+- **Menu "⋮"** no cartão de identidade, com exatamente duas opções: "Editar Perfil" (alterna o
   painel para modo de edição — CPF/ID continuam travados mesmo editando — com botões
   "Cancelar"/"Salvar alterações") e "Excluir conta" (abre confirmação; como essa
   funcionalidade não existe no protótipo, a confirmação termina num aviso de que exclusão de

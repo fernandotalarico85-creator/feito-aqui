@@ -21,7 +21,7 @@ const ICONE_CADEADO = (
  * usado por cliente e worker. Layout em 2 colunas: cartão fixo à esquerda (avatar,
  * nome, papel, ID de cadastro, "Enviar mensagem" desabilitado, navegação vertical) e o
  * painel "Informações" à direita, que abre em modo leitura e só vira formulário
- * editável via "Editar" no menu "⋮" — nome/sobrenome/e-mail/endereço/foto continuam
+ * editável via "Editar Perfil" no menu "⋮" — nome/sobrenome/e-mail/endereço/foto continuam
  * editáveis (Seção 3.9), CPF e ID de cadastro continuam travados mesmo em edição.
  *
  * Identidade visual própria (Prompt 20, Seção 3.11) — exceção pontual só para esta
@@ -174,7 +174,7 @@ export default function PerfilCard({
                 }}
                 className="block w-full px-3 py-2 text-left text-sm text-[#243138] hover:bg-[#E7EEF0]"
               >
-                Editar
+                Editar Perfil
               </button>
               <button
                 type="button"
