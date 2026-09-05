@@ -82,7 +82,7 @@ export default function GeoActionForm({
 
       <button
         type="submit"
-        className="self-start rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+        className="self-start rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
       >
         {buttonLabel}
       </button>

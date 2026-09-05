@@ -61,7 +61,7 @@ export default async function DestaquePage({
           <form action={comprarDestaqueAction} className="mt-4">
             <button
               type="submit"
-              className="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
             >
               {destaqueAtivo ? "Renovar" : "Comprar"} destaque — {DESTAQUE_DURACAO_DIAS} dias por
               R$ {VALOR_DESTAQUE_REAIS.toFixed(2)}

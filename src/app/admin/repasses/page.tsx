@@ -66,7 +66,7 @@ export default async function RepassesAdminPage({
                   <input type="hidden" name="modo" value="AGORA" />
                   <button
                     type="submit"
-                    className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+                    className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
                   >
                     Liberar agora
                   </button>

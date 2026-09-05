@@ -114,7 +114,7 @@ export default async function AcompanhamentoBookingClientePage({
               <span
                 className={`rounded-full px-3 py-1 font-medium ${
                   i <= etapaAtual
-                    ? "bg-stone-900 text-white"
+                    ? "bg-primary text-white"
                     : "bg-stone-100 text-stone-400"
                 }`}
               >
@@ -280,7 +280,7 @@ export default async function AcompanhamentoBookingClientePage({
             <input type="hidden" name="bookingId" value={booking.id} />
             <button
               type="submit"
-              className="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
             >
               Confirmar entrega
             </button>
@@ -377,7 +377,7 @@ export default async function AcompanhamentoBookingClientePage({
               </p>
               <button
                 type="submit"
-                className="self-start rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                className="self-start rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
               >
                 Enviar avaliação
               </button>

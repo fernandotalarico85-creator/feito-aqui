@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { confirmarConclusoesVencidas } from "@/lib/confirmacaoConclusao";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { cancelarPedidoAction } from "./actions";
 
 const STATUS_CANCELAVEL = ["TRIAGEM", "AGUARDANDO_ORCAMENTO", "ORCADO"];
@@ -15,6 +16,16 @@ const STATUS_LABEL: Record<string, string> = {
   EM_ANDAMENTO: "Em andamento",
   CONCLUIDO: "Concluído",
   CANCELADO: "Cancelado",
+};
+
+const STATUS_TONE: Record<string, "success" | "alert" | "secondary" | "neutral"> = {
+  TRIAGEM: "alert",
+  AGUARDANDO_ORCAMENTO: "alert",
+  ORCADO: "alert",
+  FECHADO: "secondary",
+  EM_ANDAMENTO: "secondary",
+  CONCLUIDO: "success",
+  CANCELADO: "neutral",
 };
 
 export default async function MeusPedidosPage() {
@@ -74,7 +85,7 @@ export default async function MeusPedidosPage() {
           <p className="text-stone-600">Você ainda não fez nenhum pedido.</p>
           <Link
             href="/cliente/pedidos/novo"
-            className="mt-4 inline-block rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+            className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
           >
             Criar meu primeiro pedido
           </Link>
@@ -88,14 +99,15 @@ export default async function MeusPedidosPage() {
               return (
                 <li
                   key={cartao.projetoId}
-                  className="rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
+                  className="rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
                 >
                   <Link href={`/cliente/projetos/${cartao.projetoId}`} className="block">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-stone-900">{cartao.categoriaNome}</span>
-                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
-                        {fechados} de {total} serviços fechados
-                      </span>
+                      <StatusBadge
+                        label={`${fechados} de ${total} fechados`}
+                        tone={fechados === total ? "success" : "secondary"}
+                      />
                     </div>
                     <p className="mt-1 text-sm text-stone-500">{total} sub-serviços neste pedido</p>
                   </Link>
@@ -112,20 +124,17 @@ export default async function MeusPedidosPage() {
             return (
             <li
               key={pedido.id}
-              className="rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
+              className="rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
             >
               <Link href={linkDoPedido(pedido)} className="block">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-stone-900">{pedido.category.nome}</span>
                   <div className="flex items-center gap-2">
-                    {aguardandoConfirmacao && (
-                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                        Confirme a conclusão
-                      </span>
-                    )}
-                    <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
-                      {STATUS_LABEL[pedido.status] ?? pedido.status}
-                    </span>
+                    {aguardandoConfirmacao && <StatusBadge label="Confirme a conclusão" tone="alert" />}
+                    <StatusBadge
+                      label={STATUS_LABEL[pedido.status] ?? pedido.status}
+                      tone={STATUS_TONE[pedido.status] ?? "neutral"}
+                    />
                   </div>
                 </div>
                 <p className="mt-0.5 font-mono text-xs text-stone-400">{pedido.numeroOS}</p>

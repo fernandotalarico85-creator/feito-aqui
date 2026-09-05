@@ -1,22 +1,76 @@
 @import "tailwindcss";
 
+/* Sistema visual "Oficina" (Prompt 23, Seção 3.14) — agora o padrão do app inteiro,
+   não mais uma exceção pontual de "Meu Perfil". Reaproveita as escalas nativas do
+   Tailwind (stone/amber/emerald) redefinindo seus tons: todo `bg-stone-*`,
+   `text-amber-*`, `bg-emerald-*` etc. já usado nas telas passa a herdar a nova
+   paleta sem precisar editar classe por classe. `red-*` continua o vermelho padrão
+   (erro/ação destrutiva) — a paleta não define uma cor própria pra isso. */
+@theme {
+  --color-stone-50: #f1e9da;
+  --color-stone-100: #eadfc8;
+  --color-stone-200: #d8cbb0;
+  --color-stone-300: #c7b896;
+  --color-stone-400: #9c8f7c;
+  --color-stone-500: #6e6355;
+  --color-stone-600: #4f4739;
+  --color-stone-700: #3a342b;
+  --color-stone-800: #2e2924;
+  --color-stone-900: #262220;
+
+  --color-amber-50: #f6e2d6;
+  --color-amber-100: #f0d0bc;
+  --color-amber-200: #e8b99c;
+  --color-amber-300: #dfa184;
+  --color-amber-500: #c97244;
+  --color-amber-600: #bd6339;
+  --color-amber-700: #b5502c;
+  --color-amber-800: #8f3f22;
+
+  --color-emerald-50: #eaf0e4;
+  --color-emerald-100: #dce6d3;
+  --color-emerald-200: #c5d6b7;
+  --color-emerald-400: #86a26e;
+  --color-emerald-700: #5c7a4e;
+
+  /* Tokens próprios (Seção 3.14) sem equivalente numa escala nativa do Tailwind. */
+  --color-primary: #24425b;
+  --color-primary-dark: #1a3245;
+  --color-secondary: #3d6485;
+  --color-accent: #e8a33d;
+  --color-alert: #b5502c;
+  --color-success: #5c7a4e;
+  --color-card: #fbf7ee;
+
+  --radius-lg: 14px;
+  --radius-md: 10px;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1e9da;
+  --foreground: #262220;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-work-sans);
+  --font-heading: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
 }
 
 /* Protótipo usa apenas tema claro — várias telas ainda não têm estilos dark:,
    então herdar o dark mode do sistema deixa texto escuro sobre fundo escuro. */
 
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), var(--font-sans);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

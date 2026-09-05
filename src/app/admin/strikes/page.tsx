@@ -3,6 +3,7 @@ import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { listarWorkersParaSuspensao } from "@/lib/penalidades";
 import { STRIKES_MEDIA_LIMITE_SUSPENSAO, STRIKES_MEDIA_JANELA_MESES } from "@/lib/config";
+import FilterChip from "@/components/ui/FilterChip";
 import type { GravidadeStrike } from "@/generated/prisma/enums";
 
 const GRAVIDADES_VALIDAS: readonly string[] = ["MEDIA", "GRAVE", "GRAVISSIMA"];
@@ -15,7 +16,7 @@ const GRAVIDADE_LABEL: Record<string, string> = {
 
 const GRAVIDADE_CLASSE: Record<string, string> = {
   MEDIA: "bg-amber-100 text-amber-700",
-  GRAVE: "bg-orange-100 text-orange-700",
+  GRAVE: "bg-amber-200 text-amber-800",
   GRAVISSIMA: "bg-red-100 text-red-700",
 };
 
@@ -55,7 +56,7 @@ export default async function StrikesPage({
         <h1 className="text-xl font-semibold text-stone-900">{tituloTipo}</h1>
         <Link
           href="/admin/strikes/novo"
-          className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
         >
           + Registrar strike
         </Link>
@@ -77,7 +78,19 @@ export default async function StrikesPage({
         </div>
       )}
 
-      <form className="mt-4 flex flex-wrap gap-3 text-sm">
+      <div className="mt-4 flex gap-2">
+        <FilterChip href="/admin/strikes" selected={!tipo}>
+          Todos
+        </FilterChip>
+        <FilterChip href="/admin/strikes?tipo=cliente" selected={tipo === "cliente"}>
+          Clientes
+        </FilterChip>
+        <FilterChip href="/admin/strikes?tipo=worker" selected={tipo === "worker"}>
+          Workers
+        </FilterChip>
+      </div>
+
+      <form className="mt-3 flex flex-wrap gap-3 text-sm">
         {tipo && <input type="hidden" name="tipo" value={tipo} />}
         <select
           name="workerId"
@@ -103,7 +116,7 @@ export default async function StrikesPage({
         </select>
         <button
           type="submit"
-          className="rounded-md bg-stone-900 px-3 py-1.5 font-medium text-white hover:bg-stone-700"
+          className="rounded-md bg-primary px-3 py-1.5 font-medium text-white hover:bg-primary-dark"
         >
           Filtrar
         </button>
@@ -122,7 +135,7 @@ export default async function StrikesPage({
           {strikes.map((strike) => (
             <li
               key={strike.id}
-              className="flex items-center justify-between rounded-lg border border-stone-200 bg-white p-3"
+              className="flex items-center justify-between rounded-lg border border-stone-200 bg-card p-3 shadow-sm"
             >
               <div>
                 <p className="text-sm font-medium text-stone-900">

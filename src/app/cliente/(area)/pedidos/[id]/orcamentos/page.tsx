@@ -140,7 +140,7 @@ export default async function OrcamentosRecebidosPage({
                       <input type="hidden" name="budgetId" value={budget.id} />
                       <button
                         type="submit"
-                        className="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
                       >
                         Aceitar este orçamento
                       </button>

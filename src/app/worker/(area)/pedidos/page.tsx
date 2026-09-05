@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { workerCompativelComAgenda } from "@/lib/agenda";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export default async function PedidosRecebidosPage({
   searchParams,
@@ -66,18 +67,14 @@ export default async function PedidosRecebidosPage({
               <li key={pedido.id}>
                 <Link
                   href={`/worker/pedidos/${pedido.id}`}
-                  className="block rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
+                  className="block rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-stone-900">{pedido.category.nome}</span>
                     {jaOrcado ? (
-                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
-                        Orçamento enviado
-                      </span>
+                      <StatusBadge label="Orçamento enviado" tone="neutral" />
                     ) : (
-                      <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-700">
-                        Novo
-                      </span>
+                      <StatusBadge label="Novo" tone="alert" />
                     )}
                   </div>
                   <p className="font-mono text-xs text-stone-400">{pedido.numeroOS}</p>

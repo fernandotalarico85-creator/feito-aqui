@@ -37,10 +37,10 @@ export default function UserMenuDropdown({
       <button
         type="button"
         onClick={() => setAberto((v) => !v)}
-        className="flex items-center gap-1 text-stone-600 hover:text-stone-900"
+        className="flex items-center gap-1 text-white/90 hover:text-white"
       >
         {label}
-        <span className="text-xs text-stone-400">▾</span>
+        <span className="text-xs text-white/60">▾</span>
       </button>
 
       {aberto && (

@@ -85,7 +85,7 @@ export default async function PerfilWorkerPage({
           <input type="hidden" name="pedidoId" value={pedido.id} />
           <button
             type="submit"
-            className="w-full rounded-md bg-stone-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-700"
+            className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-dark"
           >
             Solicitar orçamento para &ldquo;{pedido.category.nome}&rdquo;
           </button>

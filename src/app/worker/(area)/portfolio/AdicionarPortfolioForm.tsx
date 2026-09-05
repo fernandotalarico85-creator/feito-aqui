@@ -95,7 +95,7 @@ export default function AdicionarPortfolioForm({
       <button
         type="submit"
         disabled={origem === "PLATAFORMA" && bookingsElegiveis.length === 0}
-        className="self-start rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-50"
+        className="self-start rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-50"
       >
         Publicar no portfólio
       </button>

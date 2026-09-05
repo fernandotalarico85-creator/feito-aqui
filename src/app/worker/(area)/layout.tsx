@@ -12,9 +12,9 @@ export default async function WorkerAreaLayout({
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="border-b border-stone-200 bg-white">
+      <header className="bg-primary">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link href="/worker" className="text-lg font-semibold text-stone-900">
+          <Link href="/worker" className="text-lg font-semibold text-white">
             Feito Aqui
           </Link>
           <UserMenu nome={usuario.nome} sairAction={sairWorkerAction} />

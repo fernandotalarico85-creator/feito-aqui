@@ -78,7 +78,7 @@ export default async function PortfolioWorkerPage({
                       <input type="hidden" name="servicePhotoId" value={foto.id} />
                       <button
                         type="submit"
-                        className="w-full rounded-md bg-stone-900 px-2 py-1 text-xs font-medium text-white hover:bg-stone-700"
+                        className="w-full rounded-md bg-primary px-2 py-1 text-xs font-medium text-white hover:bg-primary-dark"
                       >
                         Publicar no portfólio
                       </button>

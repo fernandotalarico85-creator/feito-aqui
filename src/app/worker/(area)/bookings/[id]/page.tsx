@@ -177,7 +177,7 @@ export default async function AcompanhamentoBookingWorkerPage({
             <li key={etapa} className="flex items-center gap-2">
               <span
                 className={`rounded-full px-3 py-1 font-medium ${
-                  i <= etapaAtual ? "bg-stone-900 text-white" : "bg-stone-100 text-stone-400"
+                  i <= etapaAtual ? "bg-primary text-white" : "bg-stone-100 text-stone-400"
                 }`}
               >
                 {STATUS_LABEL[etapa]}
@@ -420,7 +420,7 @@ export default async function AcompanhamentoBookingWorkerPage({
                 </div>
                 <button
                   type="submit"
-                  className="self-start rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                  className="self-start rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
                 >
                   Enviar contestação
                 </button>

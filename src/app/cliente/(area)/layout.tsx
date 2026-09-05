@@ -12,23 +12,25 @@ export default async function ClienteLayout({
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="border-b border-stone-200 bg-white">
+      <header className="bg-primary">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link href="/cliente/pedidos" className="text-lg font-semibold text-stone-900">
+          <Link href="/cliente/pedidos" className="text-lg font-semibold text-white">
             Feito Aqui
           </Link>
-          <div className="flex items-center gap-4 text-sm">
-            <Link
-              href="/cliente/pedidos/novo"
-              className="rounded-md bg-stone-900 px-3 py-1.5 font-medium text-white hover:bg-stone-700"
-            >
-              + Novo pedido
-            </Link>
-            <UserMenu nome={usuario.nome} sairAction={sairAction} />
-          </div>
+          <UserMenu nome={usuario.nome} sairAction={sairAction} />
         </div>
       </header>
-      <div className="mx-auto max-w-4xl px-6 py-8">{children}</div>
+      <div className="relative mx-auto max-w-4xl px-6 py-8">
+        {children}
+        {/* CTA flutuante (Prompt 23) — ação principal do cliente, ancorada no
+            canto inferior direito do conteúdo. */}
+        <Link
+          href="/cliente/pedidos/novo"
+          className="fixed bottom-6 right-6 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-lg hover:opacity-90"
+        >
+          + Novo pedido
+        </Link>
+      </div>
     </div>
   );
 }

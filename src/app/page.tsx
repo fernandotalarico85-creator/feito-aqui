@@ -23,7 +23,7 @@ export default function Home() {
           <div className="mt-4 flex gap-2">
             <Link
               href="/entrar?tipo=cliente"
-              className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
             >
               Entrar
             </Link>
@@ -45,7 +45,7 @@ export default function Home() {
           <div className="mt-4 flex gap-2">
             <Link
               href="/entrar?tipo=worker"
-              className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
             >
               Entrar
             </Link>
@@ -67,7 +67,7 @@ export default function Home() {
           <div className="mt-4">
             <Link
               href="/entrar?tipo=admin"
-              className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
             >
               Entrar
             </Link>

@@ -139,7 +139,7 @@ export default async function DisputasPage() {
                     type="submit"
                     name="decisao"
                     value="REVERTIDA"
-                    className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+                    className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
                   >
                     Reverter nota (estorna tokens)
                   </button>
@@ -214,7 +214,7 @@ export default async function DisputasPage() {
                     type="submit"
                     name="decisao"
                     value="REVERTIDA"
-                    className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+                    className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
                   >
                     Revogar strike
                   </button>
@@ -293,7 +293,7 @@ export default async function DisputasPage() {
                     type="submit"
                     name="decisao"
                     value="CONFIRMAR_ENTREGA"
-                    className="rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700"
+                    className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
                   >
                     Confirmar entrega (libera repasse)
                   </button>

@@ -246,23 +246,10 @@ mudam, só a organização visual e como a edição é acionada. Layout em 2 col
   fazia parte do escopo deste redesenho — continua como uma seção própria, abaixo do cartão,
   com seu próprio formulário sempre editável (inalterada).
 
-### 3.13 Identidade visual exclusiva de "Meu Perfil" (Prompt 20) `[exceção pontual]`
-Só a tela "Meu Perfil" (cliente e worker) usa uma paleta/tipografia própria — todo o resto do
-protótipo (barra superior, outras páginas dos dropdowns, admin) continua com o estilo padrão
-(stone/Geist). Definida em `src/lib/fontsPerfil.ts` (fontes) e aplicada diretamente via classes
-Tailwind arbitrárias em `src/components/PerfilCard.tsx` e nas páginas
-`/cliente/perfil`/`/worker/perfil` (incluindo a seção "Dados do perfil" do worker, pra não
-ficar visualmente inconsistente com o resto da tela):
-- Cores: `#1F4E5F` (primária — títulos, botão "Salvar alterações", pill "Cliente"), `#3F7C8A`
-  (secundária — tags de categoria do worker, item ativo "Informações" no menu vertical),
-  `#C0592C` (pill "Worker"), `#E7EEF0` (fundo suave de badges/botão "Enviar mensagem"),
-  `#243138` (texto principal), `#667680` (texto secundário/labels de seção em maiúsculas).
-- Tipografia: Manrope (700–800) via Google Fonts em títulos, labels de seção e nome do
-  usuário; Inter no texto corrido e nos valores dos campos.
-- Cards com cantos arredondados (~16px) e sombra suave; avatar com gradiente
-  primária→secundária quando não há foto; badges de ID/CPF com ícone de cadeado.
-- Confirmado por teste manual (clique real, não só programático) que o menu "⋮ > Editar"
-  funciona ponta a ponta nas duas telas depois da mudança visual.
+### 3.13 Identidade visual de "Meu Perfil" (Prompt 20) — SUBSTITUÍDA pela Seção 3.15
+A exceção pontual (paleta teal/terracota só nessa tela) descrita aqui no Prompt 20 não existe
+mais — o Prompt 23 promoveu um sistema visual novo para o app inteiro, "Meu Perfil" incluído.
+Ver Seção 3.15.
 
 ### 3.14 Projeto multi-worker (Prompt 22)
 Categoria com mais de 1 sub-serviço (ex.: "Reforma de banheiro" → hidráulica, elétrica,
@@ -282,6 +269,37 @@ impermeabilização, revestimento, marcenaria, pintura) vira um `Project` "guard
 - Worker não precisa saber que um pedido faz parte de um Project maior — cada sub-serviço chega
   pra ele como um `ServiceRequest` normal da categoria, com o nome do sub-serviço no
   `descricaoLivre`/`subServicosJson`.
+
+### 3.15 Sistema visual "Oficina" — padrão do app inteiro (Prompt 23)
+Substitui a paleta stone/Geist padrão em TODAS as telas (cliente, worker, admin) — não é mais
+uma exceção pontual (Seção 3.13, obsoleta). Reskin puro: nenhuma rota, regra de negócio ou
+estrutura de navegação mudou.
+- **Cores** — definidas em `src/app/globals.css` como tokens do Tailwind (`@theme`), incluindo
+  um truque deliberado: as escalas nativas `stone`/`amber`/`emerald` foram redefinidas com os
+  tons da nova paleta em vez de trocadas por nomes novos — todo `bg-stone-*`/`text-amber-*`/
+  etc. já usado nas ~45 telas do protótipo herda a cor nova automaticamente, sem editar
+  componente por componente. `red-*` continua o vermelho nativo do Tailwind (erro/ação
+  destrutiva — a paleta não define uma cor própria pra isso). Tokens próprios sem escala nativa
+  equivalente: `primary` `#24425B`, `primary-dark` `#1A3245`, `secondary` `#3D6485`, `accent`
+  `#E8A33D`, `alert` `#B5502C`, `success` `#5C7A4E`, `card` `#FBF7EE`.
+- **Tipografia** — Bricolage Grotesque (700–800, `--font-heading`) e Work Sans (`--font-sans`,
+  corpo), carregadas em `src/app/layout.tsx`. `globals.css` aplica Bricolage a `h1`–`h4`
+  globalmente via CSS puro (sem precisar de classe em cada título); a classe utilitária
+  `font-heading` cobre pills/chips/títulos de card que não são tags de heading.
+- **Componentes reutilizáveis novos** (`src/components/ui/`): `StatusBadge` (bolinha colorida +
+  texto maiúsculo — tons `success`/`alert`/`secondary`/`neutral`) e `FilterChip` (cantos ~8px,
+  fundo secundário quando selecionado). Aplicados como referência em pelo menos 3 telas (Meus
+  Pedidos do cliente, Pedidos Recebidos do worker, Strikes do admin) — o resto das telas herdou
+  só a cor/fonte/raio automaticamente, ainda com o formato de badge antigo (pílula simples, sem
+  bolinha/maiúsculas) `[padrão de protótipo, ajustável — trocar os badges restantes por
+  StatusBadge é mecânico, tela por tela, quando fizer sentido]`.
+- **CTA flutuante** — "+ Novo pedido" do cliente virou um botão flutuante (`fixed`, canto
+  inferior direito, cor `accent`) em vez de ficar na barra superior; a topbar (fundo `primary`,
+  texto claro) é compartilhada pelos três layouts (cliente/worker/admin) e pelo dropdown do
+  nome do usuário (`src/components/UserMenuDropdown.tsx`).
+- **"Meu Perfil"** migrou da paleta teal/terracota exclusiva (Seção 3.13) para este sistema —
+  mesma estrutura em 2 colunas dos Prompts 19-20, só cor/fonte trocadas.
+- Sem dark mode no protótipo (Seção "sem dark mode" já documentada) — nada mudou aí.
 
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 

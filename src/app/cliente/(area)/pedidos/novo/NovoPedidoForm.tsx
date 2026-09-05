@@ -215,7 +215,7 @@ export default function NovoPedidoForm({
 
       <button
         type="submit"
-        className="rounded-md bg-stone-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-700"
+        className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-dark"
       >
         Buscar profissionais recomendados
       </button>

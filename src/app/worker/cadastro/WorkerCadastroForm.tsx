@@ -217,7 +217,7 @@ export default function WorkerCadastroForm({
 
       <button
         type="submit"
-        className="mt-2 rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+        className="mt-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
       >
         Criar conta
       </button>

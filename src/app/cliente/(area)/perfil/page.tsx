@@ -1,7 +1,6 @@
 import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import PerfilCard from "@/components/PerfilCard";
-import { manropePerfil } from "@/lib/fontsPerfil";
 import { atualizarPerfilClienteAction } from "./actions";
 
 const MENSAGENS_ERRO: Record<string, string> = {
@@ -23,9 +22,7 @@ export default async function PerfilClientePage({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className={`${manropePerfil.className} text-2xl font-extrabold text-[#243138]`}>
-        Meu perfil
-      </h1>
+      <h1 className="text-2xl font-extrabold text-stone-900">Meu perfil</h1>
 
       {params.erro && (
         <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
