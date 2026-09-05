@@ -173,6 +173,7 @@ model ClientProfile {
   enderecoCep         String
 
   enderecos            Address[]
+  projects             Project[]
   serviceRequests      ServiceRequest[]
   walletTransactions   WalletTransaction[]
   strikes              Strike[]
@@ -361,6 +362,7 @@ model ServiceCategory {
   subServicos     SubService[]
   workers         WorkerProfile[]
   serviceRequests ServiceRequest[]
+  projects        Project[]
 }
 
 model SubService {
@@ -376,6 +378,25 @@ model SubService {
 // Pedido → orçamento → fechamento
 // ---------------------------------------------------------------------------
 
+/**
+ * Pedido "guarda-chuva" (Prompt 22 / Seção 3.12) — só existe quando a categoria tem
+ * mais de 1 sub-serviço; cada sub-serviço vira um ServiceRequest filho independente
+ * (próprio orçamento/aceite/booking). Categoria de sub-serviço único não usa Project.
+ */
+model Project {
+  id              String        @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   ServiceCategory @relation(fields: [categoryId], references: [id])
+
+  descricaoLivre String
+  criadoEm       DateTime @default(now())
+
+  serviceRequests ServiceRequest[]
+}
+
 model ServiceRequest {
   id              String        @id @default(cuid())
   // Identificador legível (Prompt 11) — formato OS-AAMMDD-NNNNN, gerado em
@@ -383,6 +404,10 @@ model ServiceRequest {
   numeroOS        String        @unique
   clientProfileId String
   clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  // Presente só quando o pedido nasceu de uma categoria multi-sub-serviço (Prompt 22).
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   categoryId String
   category   ServiceCategory @relation(fields: [categoryId], references: [id])

@@ -5,6 +5,7 @@ import { confirmarConclusoesVencidas } from "@/lib/confirmacaoConclusao";
 import { cancelarPedidoAction } from "./actions";
 
 const STATUS_CANCELAVEL = ["TRIAGEM", "AGUARDANDO_ORCAMENTO", "ORCADO"];
+const FECHADOS = ["FECHADO", "EM_ANDAMENTO", "CONCLUIDO"];
 
 const STATUS_LABEL: Record<string, string> = {
   TRIAGEM: "Em triagem",
@@ -23,7 +24,7 @@ export default async function MeusPedidosPage() {
 
   const pedidos = await prisma.serviceRequest.findMany({
     where: { clientProfile: { userId: usuario.id } },
-    include: { category: true, address: true, budgets: { include: { booking: true } } },
+    include: { category: true, address: true, budgets: { include: { booking: true } }, project: true },
     orderBy: { criadoEm: "desc" },
   });
 
@@ -32,6 +33,36 @@ export default async function MeusPedidosPage() {
     if (aceito?.booking) return `/cliente/bookings/${aceito.booking.id}`;
     if (pedido.budgets.length > 0) return `/cliente/pedidos/${pedido.id}/orcamentos`;
     return `/cliente/pedidos/${pedido.id}/profissionais`;
+  }
+
+  // Pedidos com Project (Prompt 22, categoria multi-sub-serviço) agrupam sob um único
+  // cabeçalho na lista; pedidos avulsos continuam um card cada, como sempre.
+  type Pedido = (typeof pedidos)[number];
+  type Cartao =
+    | { tipo: "avulso"; pedido: Pedido }
+    | { tipo: "projeto"; projetoId: string; categoriaNome: string; itens: Pedido[] };
+
+  const cartoes: Cartao[] = [];
+  const indicePorProjeto = new Map<string, number>();
+
+  for (const pedido of pedidos) {
+    if (!pedido.project) {
+      cartoes.push({ tipo: "avulso", pedido });
+      continue;
+    }
+    const idx = indicePorProjeto.get(pedido.project.id);
+    if (idx === undefined) {
+      indicePorProjeto.set(pedido.project.id, cartoes.length);
+      cartoes.push({
+        tipo: "projeto",
+        projetoId: pedido.project.id,
+        categoriaNome: pedido.category.nome,
+        itens: [pedido],
+      });
+    } else {
+      const cartao = cartoes[idx];
+      if (cartao.tipo === "projeto") cartao.itens.push(pedido);
+    }
   }
 
   return (
@@ -50,7 +81,29 @@ export default async function MeusPedidosPage() {
         </div>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
-          {pedidos.map((pedido) => {
+          {cartoes.map((cartao) => {
+            if (cartao.tipo === "projeto") {
+              const total = cartao.itens.length;
+              const fechados = cartao.itens.filter((sr) => FECHADOS.includes(sr.status)).length;
+              return (
+                <li
+                  key={cartao.projetoId}
+                  className="rounded-lg border border-stone-200 bg-white p-4 hover:border-stone-400"
+                >
+                  <Link href={`/cliente/projetos/${cartao.projetoId}`} className="block">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-stone-900">{cartao.categoriaNome}</span>
+                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
+                        {fechados} de {total} serviços fechados
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-stone-500">{total} sub-serviços neste pedido</p>
+                  </Link>
+                </li>
+              );
+            }
+
+            const pedido = cartao.pedido;
             const aceito = pedido.budgets.find((b) => b.status === "ACEITO" && b.booking);
             const aguardandoConfirmacao =
               aceito?.booking?.status === "CONCLUIDO" &&

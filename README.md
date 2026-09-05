@@ -137,6 +137,11 @@ Implementado de verdade, com efeito real no banco de dados:
 - **Identidade visual exclusiva de "Meu Perfil"** (Seção 3.13, `src/lib/fontsPerfil.ts`):
   só essa tela usa a paleta `#1F4E5F`/`#3F7C8A`/`#C0592C`/`#E7EEF0` e as fontes Manrope/Inter
   — exceção pontual, o resto do protótipo continua no estilo padrão (stone/Geist).
+- **Projeto multi-worker** (Seção 3.14): categoria com mais de 1 sub-serviço vira um `Project`
+  com um `ServiceRequest` filho por sub-serviço — cada um com orçamento, aceite, booking e
+  comissão independentes. "Meus Pedidos" agrupa os filhos sob um cabeçalho único com contagem
+  agregada ("X de Y serviços fechados"); `/cliente/projetos/[id]` lista cada sub-serviço.
+  Categoria de sub-serviço único continua sem `Project`, como sempre.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

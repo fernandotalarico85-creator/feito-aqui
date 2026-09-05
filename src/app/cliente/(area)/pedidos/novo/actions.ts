@@ -77,6 +77,39 @@ export async function criarPedidoAction(formData: FormData) {
     addressId = endereco.id;
   }
 
+  // Categoria com mais de 1 sub-serviço vira um Project "guarda-chuva" com um
+  // ServiceRequest filho por sub-serviço, cada um com seu próprio ciclo de
+  // orçamento/aceite/booking (Prompt 22 / Seção 3.12). Categoria de sub-serviço
+  // único continua exatamente como antes, sem Project.
+  if (sugestao.subServicos.length > 1) {
+    const project = await prisma.project.create({
+      data: {
+        clientProfileId: clientProfile.id,
+        categoryId: categoriaId,
+        descricaoLivre,
+      },
+    });
+
+    for (const subServico of sugestao.subServicos) {
+      await prisma.serviceRequest.create({
+        data: {
+          numeroOS: await gerarNumeroDocumento("OS"),
+          clientProfileId: clientProfile.id,
+          projectId: project.id,
+          categoryId: categoriaId,
+          addressId,
+          descricaoLivre: `${descricaoLivre} — ${subServico.nome}`,
+          subServicosJson: JSON.stringify([subServico]),
+          janelaDataInicio: inicio,
+          janelaDataFim: fim,
+          status: "AGUARDANDO_ORCAMENTO",
+        },
+      });
+    }
+
+    redirect(`/cliente/projetos/${project.id}`);
+  }
+
   const numeroOS = await gerarNumeroDocumento("OS");
 
   const pedido = await prisma.serviceRequest.create({

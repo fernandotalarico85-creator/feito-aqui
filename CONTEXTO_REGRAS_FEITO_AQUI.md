@@ -32,8 +32,12 @@ plataforma cobra comissão. Vertical de lançamento do protótipo: **reforma/con
   prazo, taxa de comparecimento, tempo médio de resposta, volume de serviços concluídos,
   elegívelParaTriagem (bool, corte de qualidade), destaquePago (bool + validade).
 - **Agenda** — workerId, data, disponível (bool).
-- **ServiceRequest** (pedido do cliente) — clienteId, descrição livre, categoria(s) sugeridas
-  pela triagem, sub-serviços, janela de data desejada, status (`triagem` | `aguardando_orcamento`
+- **Project** (Seção 3.14) — pedido "guarda-chuva" só quando a categoria tem mais de 1
+  sub-serviço; clienteId, categoryId, descrição livre. Agrupa os `ServiceRequest` filhos, um por
+  sub-serviço, cada um com seu próprio ciclo de orçamento/aceite/booking.
+- **ServiceRequest** (pedido do cliente, ou sub-serviço de um Project — Seção 3.14) —
+  clienteId, projectId (opcional), descrição livre, categoria(s) sugeridas pela triagem,
+  sub-serviços, janela de data desejada, status (`triagem` | `aguardando_orcamento`
   | `orcado` | `fechado` | `em_andamento` | `concluido` | `cancelado`).
 - **Budget** (orçamento) — serviceRequestId, workerId, valor, prazoComprometido (definido pelo
   worker, não pela IA), status (`pendente` | `aceito` | `recusado`).
@@ -259,6 +263,25 @@ ficar visualmente inconsistente com o resto da tela):
   primária→secundária quando não há foto; badges de ID/CPF com ícone de cadeado.
 - Confirmado por teste manual (clique real, não só programático) que o menu "⋮ > Editar"
   funciona ponta a ponta nas duas telas depois da mudança visual.
+
+### 3.14 Projeto multi-worker (Prompt 22)
+Categoria com mais de 1 sub-serviço (ex.: "Reforma de banheiro" → hidráulica, elétrica,
+impermeabilização, revestimento, marcenaria, pintura) vira um `Project` "guarda-chuva" com um
+`ServiceRequest` FILHO por sub-serviço, em vez de um único pedido cobrindo tudo:
+- Cada filho tem seu próprio `numeroOS`, orçamentos, aceite, `Booking` e comissão — igual a um
+  pedido avulso, sem nenhuma mudança na lógica de fechamento/comissão em si (Seção 3.1). Aceitar
+  o orçamento de um sub-serviço não afeta os demais; cancelamento/atraso/disputa/avaliação em um
+  também são isolados (cada `ServiceRequest` já seguia essas regras individualmente).
+- Categoria com 0 ou 1 sub-serviço continua exatamente como antes — sem `Project`, um único
+  `ServiceRequest`.
+- Cliente vê os sub-serviços de um mesmo Project agrupados em "Meus Pedidos" sob um cabeçalho
+  único com contagem agregada ("X de Y serviços fechados" — conta como fechado
+  `FECHADO`/`EM_ANDAMENTO`/`CONCLUIDO`); abrir o grupo (`/cliente/projetos/[id]`) mostra cada
+  sub-serviço com seu próprio card, reaproveitando as telas de pedido avulso (orçamentos,
+  acompanhamento) sem modificação.
+- Worker não precisa saber que um pedido faz parte de um Project maior — cada sub-serviço chega
+  pra ele como um `ServiceRequest` normal da categoria, com o nome do sub-serviço no
+  `descricaoLivre`/`subServicosJson`.
 
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
