@@ -53,7 +53,7 @@ export default async function AdminWorkerDetalhePage({
       </div>
       <p className="font-mono text-sm text-stone-500">{worker.user.idCadastro}</p>
 
-      <section className="mt-6 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-6 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Identificação</h2>
         <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
           <dt className="text-stone-500">CPF</dt>
@@ -67,7 +67,7 @@ export default async function AdminWorkerDetalhePage({
         </dl>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Endereço</h2>
         <p className="mt-2 text-sm text-stone-900">
           {worker.enderecoLogradouro}, {worker.enderecoNumero}
@@ -77,7 +77,7 @@ export default async function AdminWorkerDetalhePage({
         </p>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Desempenho</h2>
         <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
           <dt className="text-stone-500">Nota média</dt>
@@ -97,7 +97,7 @@ export default async function AdminWorkerDetalhePage({
         </dl>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Documento de verificação</h2>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
           <StatusBadge
@@ -135,7 +135,7 @@ export default async function AdminWorkerDetalhePage({
         </p>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold text-primary">Portfólio</h2>
           <Link href="/admin/workers/portfolio" className="text-xs text-secondary underline">
@@ -144,7 +144,7 @@ export default async function AdminWorkerDetalhePage({
         </div>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Strikes ({worker.strikes.length})</h2>
         {worker.strikes.length === 0 ? (
           <p className="mt-2 text-sm text-stone-500">Nenhum strike.</p>

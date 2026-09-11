@@ -67,7 +67,7 @@ export default async function PedidosRecebidosPage({
               <li key={pedido.id}>
                 <Link
                   href={`/worker/pedidos/${pedido.id}`}
-                  className="block rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
+                  className="block rounded-lg border border-stone-200 bg-card p-4 hover:border-stone-400"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-stone-900">{pedido.category.nome}</span>

@@ -61,7 +61,7 @@ export default async function AdminClienteDetalhePage({
       </h1>
       <p className="font-mono text-sm text-stone-500">{cliente.user.idCadastro}</p>
 
-      <section className="mt-6 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-6 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Identificação</h2>
         <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
           <dt className="text-stone-500">CPF</dt>
@@ -75,7 +75,7 @@ export default async function AdminClienteDetalhePage({
         </dl>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Endereço</h2>
         <p className="mt-2 text-sm text-stone-900">
           {cliente.enderecoLogradouro}, {cliente.enderecoNumero}
@@ -85,7 +85,7 @@ export default async function AdminClienteDetalhePage({
         </p>
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Pedidos ({cliente.serviceRequests.length})</h2>
         {cliente.serviceRequests.length === 0 ? (
           <p className="mt-2 text-sm text-stone-500">Nenhum pedido.</p>
@@ -101,7 +101,7 @@ export default async function AdminClienteDetalhePage({
         )}
       </section>
 
-      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+      <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
         <h2 className="text-base font-extrabold text-primary">Strikes ({cliente.strikes.length})</h2>
         {cliente.strikes.length === 0 ? (
           <p className="mt-2 text-sm text-stone-500">Nenhum strike.</p>
@@ -124,7 +124,7 @@ export default async function AdminClienteDetalhePage({
       </section>
 
       {cliente.cancelamentosTardios.length > 0 && (
-        <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4 shadow-sm">
+        <section className="mt-4 rounded-lg border border-stone-200 bg-card p-4">
           <h2 className="text-base font-extrabold text-primary">
             Cancelamentos tardios ({cliente.cancelamentosTardios.length})
           </h2>

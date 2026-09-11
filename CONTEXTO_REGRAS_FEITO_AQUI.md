@@ -323,6 +323,34 @@ rejeitar) — puramente para o admin consultar quem está cadastrado.
   tela foi tocada por este prompt. A tela de detalhe do worker linka explicitamente pra lá
   ("Aprovar/rejeitar continua em Aprovar Workers") em vez de duplicar os botões de ação.
 
+### 3.17 Reskin "Clínica Experts" — 2ª troca de sistema visual do app inteiro (Prompt 25)
+Substitui a paleta/tipografia "Oficina" (Seção 3.15) em TODAS as telas, mesma técnica: reskin
+puro sobre o esquema de tokens já existente, nenhuma rota/regra de negócio mudou. Referência:
+`Claude outputs/guia-estilo-referencia-clinica-experts.md` (estilos observados numa tela de
+terceiro, adaptados — não é um clone).
+- **Cores** (`src/app/globals.css`, mesmo truque de redefinir as escalas nativas `stone`/
+  `amber`/`emerald`): fundo geral `#F5F6F7`, cards brancos (`--color-card: #ffffff`), texto
+  principal `#1E2238`, texto secundário/terciário na escala `stone` (`#5F6580`/`#9EA5B8`),
+  borda `#E2E5EA`. Um único roxo de destaque `#8B47FF` cobre `primary`/`secondary`/`accent`
+  (CTA, links, FAB) — o guia de referência usa só 1 cor de destaque, diferente da "Oficina"
+  que tinha 3 tons distintos. `amber`/`emerald`/`alert`/`success` (semântica de status:
+  pendente/aprovado/grave etc.) ficaram como estavam — o guia não define isso, só paleta
+  neutra + destaque.
+- **Tipografia** — fonte única **Barlow** (pesos 500/600/700) pra título e corpo, no lugar do
+  par Bricolage Grotesque + Work Sans; `--font-heading` e `--font-sans` agora apontam pro
+  mesmo font-face (`src/app/layout.tsx`).
+- **Cabeçalho** — voltou a ser claro (`bg-white border-b`) nos três layouts (cliente/worker/
+  admin), texto escuro; era escuro (`bg-primary`) na "Oficina". `UserMenuDropdown` (trigger)
+  seguiu o cabeçalho, voltou a texto escuro.
+- **Cards flat** — removido `shadow-sm`/`shadow-md` de todos os cards de conteúdo (~20
+  ocorrências); ficaram só com borda de 1px (`border-stone-200`), sem sombra, igual ao padrão
+  observado. Sombra continua só em elementos flutuantes reais (dropdown do usuário, modais,
+  menu do PerfilCard) — esses não fazem parte do reskin, são overlay, não card de página.
+- **FAB do cliente** ("+ Novo pedido") virou um círculo puro 56×56 (`h-14 w-14 rounded-full`,
+  só o símbolo "+"), sem sombra — antes era uma pílula com o texto do lado.
+- Radius globais ajustados: `--radius-lg: 10px` (cards/chips), `--radius-md: 8px` (botões/
+  inputs) — antes 14px/10px.
+
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
 - Split de pagamento real / gateway de pagamento — simular com um status de pagamento mockado.

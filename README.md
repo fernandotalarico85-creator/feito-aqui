@@ -151,6 +151,11 @@ Implementado de verdade, com efeito real no banco de dados:
   busca (nome/CPF para clientes; nome/categoria + filtro de status para workers) e detalhe por
   `[id]`. Distintas de "Aprovar Workers" (`/admin/workers`, inalterada) — que continua sendo a
   única tela que aprova/rejeita verificação.
+- **Reskin "Clínica Experts"** (Seção 3.17, `src/app/globals.css`): 2ª troca de paleta/
+  tipografia do app inteiro, sobre a mesma técnica de tokens da "Oficina" — fundo cinza-claro
+  `#F5F6F7`, cards brancos flat (sem sombra, só borda 1px), 1 roxo de destaque `#8B47FF` (CTA/
+  links/FAB), fonte única Barlow. Cabeçalho voltou a ser claro; FAB do cliente virou um círculo
+  puro. Referência: `Claude outputs/guia-estilo-referencia-clinica-experts.md`.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

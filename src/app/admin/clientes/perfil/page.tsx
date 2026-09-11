@@ -68,7 +68,7 @@ export default async function AdminClientesPerfilPage({
             <li key={cliente.id}>
               <Link
                 href={`/admin/clientes/perfil/${cliente.id}`}
-                className="block rounded-lg border border-stone-200 bg-card p-3 shadow-sm hover:border-stone-400"
+                className="block rounded-lg border border-stone-200 bg-card p-3 hover:border-stone-400"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-stone-900">

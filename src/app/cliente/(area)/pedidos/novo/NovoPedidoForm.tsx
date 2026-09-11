@@ -62,7 +62,7 @@ export default function NovoPedidoForm({
               {categoriaSelecionada.subServicos.map((sub, i) => (
                 <li
                   key={sub.id}
-                  className="rounded-full bg-white px-2.5 py-1 text-xs text-stone-700 shadow-sm"
+                  className="rounded-full bg-white px-2.5 py-1 text-xs text-stone-700"
                 >
                   {i + 1}. {sub.nome}
                 </li>

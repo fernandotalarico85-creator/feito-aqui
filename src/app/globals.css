@@ -1,22 +1,21 @@
 @import "tailwindcss";
 
-/* Sistema visual "Oficina" (Prompt 23, Seção 3.14) — agora o padrão do app inteiro,
-   não mais uma exceção pontual de "Meu Perfil". Reaproveita as escalas nativas do
-   Tailwind (stone/amber/emerald) redefinindo seus tons: todo `bg-stone-*`,
-   `text-amber-*`, `bg-emerald-*` etc. já usado nas telas passa a herdar a nova
-   paleta sem precisar editar classe por classe. `red-*` continua o vermelho padrão
-   (erro/ação destrutiva) — a paleta não define uma cor própria pra isso. */
+/* Sistema visual "Clínica Experts" (Prompt 25, Seção 3.17) — reskin sobre o mesmo
+   esquema de tokens da "Oficina" (Prompt 23): as escalas nativas stone/amber/emerald
+   continuam redefinidas, só os TONS mudam, então nada por componente precisa mudar.
+   `amber`/`emerald`/`alert`/`success` ficam como estavam — o guia de referência não
+   define semântica de status, só paleta neutra + 1 cor de destaque (roxo). */
 @theme {
-  --color-stone-50: #f1e9da;
-  --color-stone-100: #eadfc8;
-  --color-stone-200: #d8cbb0;
-  --color-stone-300: #c7b896;
-  --color-stone-400: #9c8f7c;
-  --color-stone-500: #6e6355;
-  --color-stone-600: #4f4739;
-  --color-stone-700: #3a342b;
-  --color-stone-800: #2e2924;
-  --color-stone-900: #262220;
+  --color-stone-50: #f5f6f7;
+  --color-stone-100: #edeff2;
+  --color-stone-200: #e2e5ea;
+  --color-stone-300: #c7ccd9;
+  --color-stone-400: #9ea5b8;
+  --color-stone-500: #7b8299;
+  --color-stone-600: #5f6580;
+  --color-stone-700: #464b61;
+  --color-stone-800: #2e3247;
+  --color-stone-900: #1e2238;
 
   --color-amber-50: #f6e2d6;
   --color-amber-100: #f0d0bc;
@@ -33,29 +32,30 @@
   --color-emerald-400: #86a26e;
   --color-emerald-700: #5c7a4e;
 
-  /* Tokens próprios (Seção 3.14) sem equivalente numa escala nativa do Tailwind. */
-  --color-primary: #24425b;
-  --color-primary-dark: #1a3245;
-  --color-secondary: #3d6485;
-  --color-accent: #e8a33d;
+  /* Tokens próprios (Seção 3.17): roxo único de destaque (link ativo/CTA/FAB) nos
+     três — primary/secondary/accent — em vez de 3 tons distintos da paleta antiga. */
+  --color-primary: #8b47ff;
+  --color-primary-dark: #7231db;
+  --color-secondary: #8b47ff;
+  --color-accent: #8b47ff;
   --color-alert: #b5502c;
   --color-success: #5c7a4e;
-  --color-card: #fbf7ee;
+  --color-card: #ffffff;
 
-  --radius-lg: 14px;
-  --radius-md: 10px;
+  --radius-lg: 10px;
+  --radius-md: 8px;
 }
 
 :root {
-  --background: #f1e9da;
-  --foreground: #262220;
+  --background: #f5f6f7;
+  --foreground: #1e2238;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-work-sans);
-  --font-heading: var(--font-bricolage);
+  --font-sans: var(--font-barlow);
+  --font-heading: var(--font-barlow);
   --font-mono: var(--font-geist-mono);
 }
 

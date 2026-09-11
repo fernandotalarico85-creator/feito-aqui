@@ -135,7 +135,7 @@ export default async function StrikesPage({
           {strikes.map((strike) => (
             <li
               key={strike.id}
-              className="flex items-center justify-between rounded-lg border border-stone-200 bg-card p-3 shadow-sm"
+              className="flex items-center justify-between rounded-lg border border-stone-200 bg-card p-3"
             >
               <div>
                 <p className="text-sm font-medium text-stone-900">

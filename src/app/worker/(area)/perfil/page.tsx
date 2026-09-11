@@ -80,7 +80,7 @@ export default async function PerfilWorkerPage({
         />
       </div>
 
-      <section className="mt-6 rounded-lg border border-stone-200 bg-white p-5 shadow-md">
+      <section className="mt-6 rounded-lg border border-stone-200 bg-white p-5">
         <h2 className="text-base font-extrabold text-primary">Dados do perfil</h2>
         <form action={atualizarPerfilAction} className="mt-4 flex flex-col gap-4">
           <div>

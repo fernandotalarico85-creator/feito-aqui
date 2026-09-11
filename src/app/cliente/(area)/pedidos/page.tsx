@@ -99,7 +99,7 @@ export default async function MeusPedidosPage() {
               return (
                 <li
                   key={cartao.projetoId}
-                  className="rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
+                  className="rounded-lg border border-stone-200 bg-card p-4 hover:border-stone-400"
                 >
                   <Link href={`/cliente/projetos/${cartao.projetoId}`} className="block">
                     <div className="flex items-center justify-between">
@@ -124,7 +124,7 @@ export default async function MeusPedidosPage() {
             return (
             <li
               key={pedido.id}
-              className="rounded-lg border border-stone-200 bg-card p-4 shadow-sm hover:border-stone-400"
+              className="rounded-lg border border-stone-200 bg-card p-4 hover:border-stone-400"
             >
               <Link href={linkDoPedido(pedido)} className="block">
                 <div className="flex items-center justify-between">

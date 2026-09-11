@@ -86,7 +86,7 @@ export default function PerfilCard({
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
       {/* Cartão de identidade */}
-      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5 shadow-md">
+      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5">
         <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
           {fotoPerfilUrl ? (
             <Image src={fotoPerfilUrl} alt="Foto de perfil" fill unoptimized className="object-cover" />
@@ -185,7 +185,7 @@ export default function PerfilCard({
       </aside>
 
       {/* Painel "Informações" */}
-      <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-md">
+      <section className="rounded-lg border border-stone-200 bg-white p-5">
         <h2 className="text-base font-extrabold text-primary">Informações</h2>
 
         {!editando ? (
