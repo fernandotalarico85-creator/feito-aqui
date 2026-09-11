@@ -301,6 +301,28 @@ estrutura de navegação mudou.
   mesma estrutura em 2 colunas dos Prompts 19-20, só cor/fonte trocadas.
 - Sem dark mode no protótipo (Seção "sem dark mode" já documentada) — nada mudou aí.
 
+### 3.16 Diretórios de consulta "Clientes cadastrados" e "Workers cadastrados" (Prompt 24)
+Duas telas novas em `/admin`, somente-leitura, sem nenhuma ação (nenhum botão de editar/aprovar/
+rejeitar) — puramente para o admin consultar quem está cadastrado.
+- **`/admin/clientes/perfil`** — lista de clientes com busca por nome ou CPF (`?busca=`), GET +
+  `searchParams`, igual ao padrão de busca server-side já usado em Strikes. Cada card mostra
+  nome, `idCadastro`, CPF, e-mail, cidade/UF, data de cadastro e contagem de pedidos/strikes, e
+  linka pra `/admin/clientes/perfil/[id]`.
+- **`/admin/clientes/perfil/[id]`** — detalhe: Identificação, Endereço, Pedidos (com
+  `StatusBadge`), Strikes, e Cancelamentos tardios (só aparece se houver algum).
+- **`/admin/workers/perfil`** — lista de workers com busca por nome/categoria (`?busca=`) e
+  filtro por status via `FilterChip` (Todos/Verificados/Pendentes, `?status=`). Cada card mostra
+  nome, `idCadastro`, `StatusBadge` de verificação, categorias e métricas de desempenho (nota,
+  concluídos, % no prazo, % comparecimento, tempo de resposta, strikes, destaque pago).
+- **`/admin/workers/perfil/[id]`** — detalhe: Identificação, Endereço, Desempenho (todas as
+  métricas), Documento de verificação (status + links dos documentos, sem botão de
+  aprovar/rejeitar) e Strikes.
+- **Distinção importante**: "Workers > Perfil" (`/admin/workers/perfil`, esta seção) é só
+  consulta. "Workers > Aprovar Workers" (`/admin/workers`, pré-existente) continua sendo a fila
+  de aprovação/rejeição de verificação e documento — nenhuma rota, componente ou lógica dessa
+  tela foi tocada por este prompt. A tela de detalhe do worker linka explicitamente pra lá
+  ("Aprovar/rejeitar continua em Aprovar Workers") em vez de duplicar os botões de ação.
+
 ## 4. Fora de escopo da v0.1 (não implementar ainda)
 
 - Split de pagamento real / gateway de pagamento — simular com um status de pagamento mockado.

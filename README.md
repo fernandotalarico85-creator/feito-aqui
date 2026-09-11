@@ -146,6 +146,11 @@ Implementado de verdade, com efeito real no banco de dados:
   `src/components/ui/StatusBadge.tsx` e `FilterChip.tsx` são os componentes novos de selo/chip,
   aplicados como referência em Meus Pedidos, Pedidos Recebidos e Strikes do admin. "+ Novo
   pedido" virou um CTA flutuante no canto inferior direito.
+- **Diretórios "Clientes cadastrados" e "Workers cadastrados"** (Seção 3.16,
+  `/admin/clientes/perfil` e `/admin/workers/perfil`): telas de consulta somente-leitura, com
+  busca (nome/CPF para clientes; nome/categoria + filtro de status para workers) e detalhe por
+  `[id]`. Distintas de "Aprovar Workers" (`/admin/workers`, inalterada) — que continua sendo a
+  única tela que aprova/rejeita verificação.
 
 Simulado/mockado (documentado como fora de escopo pelo próprio contexto, Seção 4):
 

@@ -615,6 +615,82 @@ construção", e (c) confirme que a barra horizontal do admin não tem mais nenh
 
 ---
 
+## Prompt 24 — Diretório de clientes e de workers cadastrados no admin (busca + visão analítica)
+
+> Nota: os Prompts 17-23 (menus de cliente/worker, "Meu Perfil" como cartão de contato, projeto
+> multi-worker, sistema visual "Oficina") foram colados diretamente nas sessões do Claude Code e
+> não têm o texto arquivado neste arquivo — só o resultado, documentado nas Seções 3.11 a 3.15 do
+> CONTEXTO_REGRAS_FEITO_AQUI.md. Este Prompt 24 continua a numeração real do projeto.
+
+```
+Ajuste na área do ADMIN — já previsto na Seção 3.10 do CONTEXTO_REGRAS_FEITO_AQUI.md, que deixou
+"Clientes > Perfil" e "Workers > Perfil" como placeholders "em construção" reservados exatamente
+para isto: "a área completa de clientes cadastrados (listagem, busca por nome/CPF, detalhe de
+cada cliente)" e "visão analítica/sintética de todos os workers cadastrados". São DUAS páginas
+separadas — não uma página só com abas — porque já existem como itens de menu distintos, em
+grupos diferentes do dropdown do admin (Prompt 16).
+
+IMPORTANTE — não é a mesma coisa que a fila de aprovação: "Workers > Aprovar Perfil"
+(`/admin/workers`, título em tela "Aprovar Workers") continua existindo exatamente como está,
+com as ações de aprovar/rejeitar verificação e documento. A tela nova em "Workers > Perfil" é
+outra coisa — um diretório/visão geral, sem ações de aprovação, só consulta.
+
+Implemente:
+
+1. CLIENTES CADASTRADOS (`/admin/clientes/perfil`) — substitua o placeholder `EmConstrucao` por
+   uma listagem de todos os `ClientProfile` (título em tela: "Clientes cadastrados"). Para cada
+   cliente, mostre: nome completo, ID de cadastro (`Cxxxxxxxx`), CPF, e-mail, cidade/UF do
+   endereço de cadastro, data de cadastro, quantidade de pedidos (`serviceRequests`) e
+   quantidade de strikes. Adicione um campo de busca (nome ou CPF, usando `limparCpf` de
+   `src/lib/cpf.ts` para normalizar o CPF digitado antes de comparar) que filtra a lista via
+   `searchParams` — siga o mesmo padrão de filtro server-side já usado em
+   `src/app/admin/strikes/page.tsx` (formulário GET + `where` condicional no Prisma), não um
+   filtro client-side.
+
+2. DETALHE DO CLIENTE (`/admin/clientes/perfil/[id]`) — ao clicar em um cliente da listagem,
+   abra uma tela de detalhe com: os mesmos dados de identificação acima, endereço completo,
+   lista de pedidos (`serviceRequests`, com número da OS e status), lista de strikes (reaproveite
+   os labels/cores de gravidade já usados em `/admin/strikes`), e cancelamentos tardios
+   (`cancelamentosTardios`) se houver. Somente leitura — sem nenhuma ação de editar/aprovar
+   nesta tela.
+
+3. WORKERS CADASTRADOS (`/admin/workers/perfil`) — substitua o placeholder `EmConstrucao` por
+   uma listagem de todos os `WorkerProfile` (título em tela: "Workers cadastrados"). Para cada
+   worker, mostre: nome completo, ID de cadastro (`Wxxxxxxxx`), categorias atendidas, status de
+   verificação (reaproveite `StatusBadge` — Seção 3.15 — com tom `success` para "Verificado" e
+   `alert` para "Pendente"), nota média (`notaMediaRecente`), volume de serviços concluídos
+   (`volumeConcluidos`), taxa de conclusão no prazo e taxa de comparecimento (`taxaConclusaoPrazo`
+   /`taxaComparecimento`, como %), tempo médio de resposta (`tempoMedioRespostaMin`), quantidade
+   de strikes, e se está com destaque pago ativo (`destaquePago`). Adicione busca por nome ou
+   categoria, mais um filtro por status de verificação usando o componente `FilterChip` (mesmo
+   padrão do filtro "tipo" em `/admin/strikes`) — igual em espírito ao que já existe, não precisa
+   inventar um padrão novo de filtro.
+
+4. DETALHE DO WORKER (`/admin/workers/perfil/[id]`) — ao clicar em um worker da listagem, abra
+   uma tela de detalhe com todos os campos acima detalhados, endereço, status do documento de
+   verificação (`documentoStatus`, com link pros documentos enviados — reaproveite o que já
+   existe em `/admin/workers`), portfólio (link para `/admin/workers/portfolio` filtrado nesse
+   worker, se for simples de filtrar; senão, só um link geral) e lista de strikes. Somente
+   leitura — sem os botões de aprovar/rejeitar (esses continuam exclusivos de
+   `/admin/workers`/"Aprovar Workers").
+
+5. MANTER A IDENTIDADE VISUAL "OFICINA" (Seção 3.15) — reaproveite `StatusBadge`, `FilterChip`,
+   as cores/tipografia/raio já definidos em `globals.css`, e o mesmo padrão de card/lista usado
+   em `/admin/strikes` e `/admin/workers`. Não introduza componente visual novo.
+
+6. ATUALIZAR O CONTEXTO_REGRAS_FEITO_AQUI.md — ao final, adicione uma nova Seção 3.16 (seguindo o
+   mesmo formato das Seções 3.9-3.15) documentando esta feature: os dois diretórios, os campos de
+   busca, e a distinção entre "Workers > Perfil" (consulta) e "Workers > Aprovar Perfil" (ação).
+
+Ao final, me mostre: (a) print da listagem de clientes com uma busca por CPF preenchida
+retornando um resultado, (b) print da listagem de workers com o filtro de status aplicado, (c)
+print do detalhe de um cliente e de um worker, e (d) confirme que `/admin/workers` (Aprovar
+Workers) não foi alterado em nada.
+```
+
+---
+
+
 ## Prompts extras (opcionais, use quando fizer sentido)
 
 ### Gerar uma versão de demonstração publicável
